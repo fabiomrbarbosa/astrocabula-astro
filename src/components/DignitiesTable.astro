@@ -39,6 +39,15 @@ function dignityLabel(d?: Dignity) {
 		: name(d.planet);
 }
 
+function triplicityLabel(
+	planet: Planet,
+	role: "day" | "night" | "participant",
+) {
+	const roleLabel =
+		role === "participant" ? t.table.participantFull : t.table[role];
+	return `${name(planet)} (${roleLabel})`;
+}
+
 const DEGREE_TICKS = Array.from({ length: 30 }, (_, i) => i);
 const FIVE_DEGREE_TICKS = [5, 10, 15, 20, 25];
 const TEN_DEGREE_TICKS = [10, 20];
@@ -46,13 +55,13 @@ const TEN_DEGREE_TICKS = [10, 20];
 // Background tint per planet, used for term segments and planet glyphs throughout the table.
 // Nodes are intentionally excluded — they're shown without a background tint.
 const PLANET_COLORS: Partial<Record<Planet, string>> = {
-	Sun: "#fbe7b6",
-	Moon: "#e8eef2",
-	Mercury: "#f5edc2",
-	Venus: "#dcead2",
-	Mars: "#f6d6d6",
-	Jupiter: "#d3ddf6",
-	Saturn: "#dadada",
+	Sun: "#FDEFD8",
+	Moon: "#E2E8EE",
+	Mercury: "#FEF9D8",
+	Venus: "#DBF0DD",
+	Mars: "#F5D8D8",
+	Jupiter: "#DAD9EC",
+	Saturn: "#E6E4E0",
 };
 
 function planetStyle(planet: Planet) {
@@ -75,6 +84,8 @@ function tickClass(degree: number, terms: { from: number }[]) {
 ---
 
 <div class="table-wrap">
+	<div class="sticky-shadow sticky-shadow-start" aria-hidden="true"></div>
+	<div class="sticky-shadow sticky-shadow-end" aria-hidden="true"></div>
 	<table class="dignities">
 		<colgroup>
 			<col class="col-sign" />
@@ -196,29 +207,30 @@ function tickClass(degree: number, terms: { from: number }[]) {
 			{
 				SIGNS.map((s) => (
 					<tr>
-						<td class="col-sign">
-							<span class="glyph" title={signName(s.sign)}>
-								{s.symbol}
-							</span>
+						<td class="col-sign" title={signName(s.sign)}>
+							<span class="glyph">{s.symbol}</span>
 						</td>
-						<td class="col-throne" style={planetStyle(s.throne)}>
-							<span class="glyph" title={name(s.throne)}>
-								{symbol(s.throne)}
-							</span>
+						<td
+							class="col-throne"
+							style={planetStyle(s.throne)}
+							title={name(s.throne)}
+						>
+							<span class="glyph">{symbol(s.throne)}</span>
 						</td>
 						<td
 							class="col-exalt"
 							style={
 								s.exaltation ? planetStyle(s.exaltation.planet) : undefined
 							}
+							title={s.exaltation ? dignityLabel(s.exaltation) : undefined}
 						>
 							{s.exaltation ? (
-								<span title={dignityLabel(s.exaltation)}>
+								<>
 									<span class="glyph">{symbol(s.exaltation.planet)}</span>
 									{s.exaltation.degree !== undefined && (
 										<sup>{s.exaltation.degree}°</sup>
 									)}
-								</span>
+								</>
 							) : (
 								<span class="empty">—</span>
 							)}
@@ -226,28 +238,25 @@ function tickClass(degree: number, terms: { from: number }[]) {
 						<td
 							class="col-triplicity sub"
 							style={planetStyle(s.triplicity.day)}
+							title={triplicityLabel(s.triplicity.day, "day")}
 						>
-							<span class="glyph" title={name(s.triplicity.day)}>
-								{symbol(s.triplicity.day)}
-							</span>
+							<span class="glyph">{symbol(s.triplicity.day)}</span>
 							<span class="tri-label">D</span>
 						</td>
 						<td
 							class="col-triplicity sub"
 							style={planetStyle(s.triplicity.night)}
+							title={triplicityLabel(s.triplicity.night, "night")}
 						>
-							<span class="glyph" title={name(s.triplicity.night)}>
-								{symbol(s.triplicity.night)}
-							</span>
+							<span class="glyph">{symbol(s.triplicity.night)}</span>
 							<span class="tri-label">N</span>
 						</td>
 						<td
 							class="col-triplicity sub"
 							style={planetStyle(s.triplicity.participant)}
+							title={triplicityLabel(s.triplicity.participant, "participant")}
 						>
-							<span class="glyph" title={name(s.triplicity.participant)}>
-								{symbol(s.triplicity.participant)}
-							</span>
+							<span class="glyph">{symbol(s.triplicity.participant)}</span>
 							<span class="tri-label">P</span>
 						</td>
 						<td class="col-terms">
@@ -308,20 +317,23 @@ function tickClass(degree: number, terms: { from: number }[]) {
 								</div>
 							</div>
 						</td>
-						<td class="col-exile" style={planetStyle(s.exile)}>
-							<span class="glyph" title={name(s.exile)}>
-								{symbol(s.exile)}
-							</span>
+						<td
+							class="col-exile"
+							style={planetStyle(s.exile)}
+							title={name(s.exile)}
+						>
+							<span class="glyph">{symbol(s.exile)}</span>
 						</td>
 						<td
 							class="col-fall"
 							style={s.fall ? planetStyle(s.fall.planet) : undefined}
+							title={s.fall ? dignityLabel(s.fall) : undefined}
 						>
 							{s.fall ? (
-								<span title={dignityLabel(s.fall)}>
+								<>
 									<span class="glyph">{symbol(s.fall.planet)}</span>
 									{s.fall.degree !== undefined && <sup>{s.fall.degree}°</sup>}
-								</span>
+								</>
 							) : (
 								<span class="empty">—</span>
 							)}
@@ -365,10 +377,8 @@ function tickClass(degree: number, terms: { from: number }[]) {
 								</div>
 							</div>
 						</td>
-						<td class="col-sign-end">
-							<span class="glyph" title={signName(s.sign)}>
-								{s.symbol}
-							</span>
+						<td class="col-sign-end" title={signName(s.sign)}>
+							<span class="glyph">{s.symbol}</span>
 						</td>
 					</tr>
 				))
@@ -379,11 +389,47 @@ function tickClass(degree: number, terms: { from: number }[]) {
 
 <style>
 	.table-wrap {
+		--cell-min-width: 5rem;
+		display: grid;
 		overflow-x: auto;
 	}
 
+	.table-wrap > table,
+	.table-wrap > .sticky-shadow {
+		grid-area: 1 / 1;
+	}
+
+	.sticky-shadow {
+		position: sticky;
+		top: 0;
+		width: 8px;
+		pointer-events: none;
+		z-index: 1;
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.sticky-shadow-start {
+		left: var(--cell-min-width);
+		background: linear-gradient(to right, rgba(43, 38, 34, 0.25), transparent);
+	}
+
+	.sticky-shadow-end {
+		right: calc(var(--cell-min-width) - 1px);
+		justify-self: end;
+		background: linear-gradient(to left, rgba(43, 38, 34, 0.25), transparent);
+	}
+
+	.table-wrap.scrolled .sticky-shadow-start {
+		opacity: 1;
+	}
+
+	.table-wrap.scrolled-end .sticky-shadow-end {
+		opacity: 1;
+	}
+
 	table.dignities {
-		--cell-min-width: 5rem;
+		--border: #a89c8c;
 		--tick-spacing: 0.25rem;
 		table-layout: fixed;
 		border-collapse: collapse;
@@ -397,6 +443,10 @@ function tickClass(degree: number, terms: { from: number }[]) {
 		border: 1px solid var(--border);
 		text-align: center;
 		vertical-align: middle;
+	}
+
+	table.dignities [title] {
+		cursor: pointer;
 	}
 
 	table.dignities th {
@@ -481,11 +531,6 @@ function tickClass(degree: number, terms: { from: number }[]) {
 		border-left: 1px solid var(--border);
 	}
 
-	.table-wrap.scrolled th.col-sign,
-	.table-wrap.scrolled td.col-sign {
-		box-shadow: 4px 0 6px -4px rgba(43, 38, 34, 0.4);
-	}
-
 	td.col-sign-end {
 		text-align: center;
 	}
@@ -510,11 +555,6 @@ function tickClass(degree: number, terms: { from: number }[]) {
 
 	.table-wrap.scrolled-end {
 		border-right: 1px solid var(--border);
-	}
-
-	.table-wrap.scrolled-end th.col-sign-end,
-	.table-wrap.scrolled-end td.col-sign-end {
-		box-shadow: -4px 0 6px -4px rgba(43, 38, 34, 0.4);
 	}
 
 	col.col-sign,

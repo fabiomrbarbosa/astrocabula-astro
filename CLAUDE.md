@@ -96,6 +96,13 @@ separate legend section (removed from `index.astro`/`pt/index.astro`):
 
 - No text labels on sign/planet glyphs in the table — names are shown via the
   `title` attribute (hover tooltip) instead. Keep this pattern for new glyphs.
+- The `title` attribute is set on the whole `td` (not the inner `.glyph`
+  span), so hovering anywhere in the cell shows the tooltip — this matches
+  the ruler `.segment`s, which already cover the full cell via `inset: 0` and
+  carry their own `title`. `table.dignities [title] { cursor: pointer }`
+  gives a visual hint regardless of which element holds the attribute.
+  Triplicity cells use `triplicityLabel()` to append the day/night/participant
+  role to the planet name (e.g. "Mars (Night)").
 - Table cells (`td`) have `padding: 0` and `min-width: 60px` by default —
   individual columns add their own width/padding as needed (e.g.
   `td.col-terms { width: 20rem }`). Headers (`th`) keep normal padding.
@@ -107,6 +114,15 @@ separate legend section (removed from `index.astro`/`pt/index.astro`):
   switcher (`.lang-switcher`) is a single pill (`border-radius: 999px`,
   `overflow: hidden`) with the active language as a filled `--accent`
   segment — don't go back to per-link borders.
+- `table.dignities` overrides `--border` to `#a89c8c` — darker and more muted
+  than the page-wide `--border` (`#c9bdac` in `Layout.astro`), scoped to the
+  table only.
+- The sticky sign columns' "scrolled" shadow is rendered by two
+  `.sticky-shadow` divs (`.table-wrap` is `display: grid`, table and shadows
+  share `grid-area: 1 / 1`), not `box-shadow` on the sticky cells — gradient
+  overlays positioned at the sticky column edges, faded in via
+  `.table-wrap.scrolled` / `.scrolled-end` (toggled by the existing scroll
+  listener script).
 
 ### Color coding (`PLANET_COLORS`)
 
@@ -121,13 +137,13 @@ planet's color.
 
 Current palette choices (intentional, don't revert without asking):
 
-- Venus: green (`#dcead2`) — moved here from Jupiter.
-- Jupiter: royal blue (`#d3ddf6`).
-- Saturn: grey (`#dadada`).
-- Mercury: pastel yellow (`#f5edc2`, softened from the original term-segment
-  yellow to fit the pastel palette), Mars: pink — unchanged from original
-  term-segment colors.
-- Sun: pale gold, Moon: pale silver-blue.
+- Venus: green (`#DBF0DD`) — moved here from Jupiter.
+- Jupiter: royal blue (`#DAD9EC`).
+- Saturn: grey (`#E6E4E0`).
+- Mercury: pastel yellow (`#FEF9D8`, softened from the original term-segment
+  yellow to fit the pastel palette), Mars: pink (`#F5D8D8`) — unchanged from
+  original term-segment colors.
+- Sun: pale gold (`#FDEFD8`), Moon: pale silver-blue (`#E2E8EE`).
 - Nodes (North/South): no associated color — `PLANET_COLORS` deliberately
   excludes them, so `planetStyle()`/`planetsStyle()` return no background for
   node cells (e.g. Gemini/Sagittarius exaltation and Sagittarius fall).
