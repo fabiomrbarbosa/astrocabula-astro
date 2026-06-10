@@ -10,6 +10,19 @@ export const DEGREE_TICKS = Array.from({ length: 30 }, (_, i) => i);
 export const FIVE_DEGREE_TICKS = [5, 10, 15, 20, 25];
 export const TEN_DEGREE_TICKS = [10, 20];
 
+// Signs whose ruler is also that planet's "sign of joy" (Venus/Taurus,
+// Moon/Cancer, Sun/Leo, Mercury/Virgo, Mars/Scorpio, Jupiter/Sagittarius,
+// Saturn/Aquarius) — marked with a "J" badge on the throne/ruler cell.
+export const JOY_SIGNS = new Set([
+	"Taurus",
+	"Cancer",
+	"Leo",
+	"Virgo",
+	"Scorpio",
+	"Sagittarius",
+	"Aquarius",
+]);
+
 // Background tint per planet, used for term segments and planet glyphs throughout the table.
 // Nodes are intentionally excluded — they're shown without a background tint.
 export const PLANET_COLORS: Partial<Record<Planet, string>> = {
@@ -72,5 +85,9 @@ export function makeLabels(lang: Lang) {
 		return `${name(planet)} (${roleLabel})`;
 	}
 
-	return { name, signName, dignityLabel, triplicityLabel };
+	function joyLabel(planet: Planet) {
+		return `${name(planet)} (${t.table.joy})`;
+	}
+
+	return { name, signName, dignityLabel, triplicityLabel, joyLabel };
 }

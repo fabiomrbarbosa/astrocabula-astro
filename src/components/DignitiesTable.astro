@@ -3,6 +3,7 @@ import { SIGNS } from "../data/dignities";
 import { ui, defaultLang, type Lang } from "../i18n";
 import {
 	FIVE_DEGREE_TICKS,
+	JOY_SIGNS,
 	TEN_DEGREE_TICKS,
 	makeLabels,
 	planetStyle,
@@ -17,7 +18,8 @@ interface Props {
 
 const { lang = defaultLang } = Astro.props;
 const t = ui[lang];
-const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
+const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
+	makeLabels(lang);
 ---
 
 <div class="table-wrap">
@@ -150,9 +152,12 @@ const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
 						<td
 							class="col-throne"
 							style={planetStyle(s.throne)}
-							title={name(s.throne)}
+							title={
+								JOY_SIGNS.has(s.sign) ? joyLabel(s.throne) : name(s.throne)
+							}
 						>
 							<span class="glyph">{symbol(s.throne)}</span>
+							{JOY_SIGNS.has(s.sign) && <span class="tri-label">J</span>}
 						</td>
 						<td
 							class="col-exalt"
@@ -447,7 +452,8 @@ const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
 	td.col-terms,
 	td.col-faces,
 	td.col-almuten,
-	td.col-triplicity {
+	td.col-triplicity,
+	td.col-throne {
 		position: relative;
 	}
 

@@ -22,7 +22,7 @@ export const ui = {
 		},
 		table: {
 			sign: "Sign",
-			throne: "Throne",
+			throne: "Ruler",
 			exalt: "Exalt.",
 			exaltFull: "Exaltation",
 			triplicities: "Triplicities",
@@ -36,9 +36,10 @@ export const ui = {
 			fall: "Fall",
 			almuten: "Almuten",
 			score: "Score",
+			joy: "Joy",
 		},
 		footer:
-			"Dignities data adapted from © 2019 Helena Avelar & Luís Ribeiro, Academia de Estudos Astrológicos.",
+			"Data adapted from © 2019 Helena Avelar & Luís Ribeiro, Academia de Estudos Astrológicos.",
 		builtBy: "Built by",
 	},
 	pt: {
@@ -66,9 +67,10 @@ export const ui = {
 			fall: "Queda",
 			almuten: "Almuten",
 			score: "Pontos",
+			joy: "Gáudio",
 		},
 		footer:
-			"Dados de dignidades adaptados de  © 2019 Helena Avelar e Luís Ribeiro, Academia de Estudos Astrológicos.",
+			"Dados adaptados de  © 2019 Helena Avelar e Luís Ribeiro, Academia de Estudos Astrológicos.",
 		builtBy: "Por",
 	},
 } as const;

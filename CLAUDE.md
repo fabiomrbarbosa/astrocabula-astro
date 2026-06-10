@@ -108,6 +108,22 @@ separate legend section (removed from `index.astro`/`pt/index.astro`):
   specificity over the base `table.dignities td { padding: 0 }` rule —
   without it, padding on the score row is silently overridden.
 
+## Joy badge
+
+`JOY_SIGNS` (`dignities-shared.ts`) is the set of signs that are also that
+sign's ruling planet's "sign of joy" (Venus/Taurus, Moon/Cancer, Sun/Leo,
+Mercury/Virgo, Mars/Scorpio, Jupiter/Sagittarius, Saturn/Aquarius — the seven
+single-domicile planets). For these signs, the throne/ruler cell gets a small
+"J" badge — `<span class="tri-label">J</span>`, reusing the same corner-badge
+class and styling as the triplicities' D/N/P labels — and its tooltip becomes
+`joyLabel(planet)` ("Planet (Joy)" / "Planeta (Gáudio)") instead of the plain
+planet name. Implemented in both `DignitiesTable.astro` (`td.col-throne`,
+added to the `position: relative` cell list) and `DignitiesAccordion.astro`
+(`.cell`, now `position: relative`, with its own `.tri-label` using fixed
+`0.25rem` offsets instead of the table's `--tick-spacing`). The English
+"Throne" header/label was renamed to "Ruler" (`t.table.throne`); Portuguese
+stays "Trono".
+
 ## Mobile accordion
 
 `DignitiesAccordion.astro` replaces the table below 768px — the toggle is
@@ -136,12 +152,13 @@ styles; both stay in the DOM — static site). It renders inside
 - The scroll-shadow script in `DignitiesTable.astro` also listens to window
   `resize` — at mobile width the hidden `.table-wrap` has zero dimensions, so
   the load-time `update()` is a no-op until a resize back to desktop.
-- The open `<summary>` gets a soft terracotta glow (`details[open] summary`,
-  `box-shadow: inset 0 0 10px rgba(193, 104, 74, 0.35)`, color `#c1684a`) to
-  show which sign is expanded. Under `prefers-contrast: more`, a crisp 1px
-  inset terracotta line is added alongside the glow. The keyboard focus ring
-  on `<summary>` (`:focus-visible`) is also terracotta (`outline: 2px solid
-  #c1684a; outline-offset: -2px`) instead of the browser default blue.
+- The keyboard focus ring on `<summary>` (`:focus-visible`) is terracotta
+  (`outline: 2px solid #c1684a; outline-offset: -2px`) instead of the browser
+  default blue — the open/closed state itself is shown only by the chevron
+  rotation, with no extra outline/glow on the open `<summary>`.
+- `details[open] summary` and `summary:focus-visible` both get a lighter
+  neutral background (`#f7f4ee`, vs. the default `#f0ebe2`) — a subtle hint
+  for which sign is open/focused, on top of the chevron and focus outline.
 
 ## UI conventions
 
