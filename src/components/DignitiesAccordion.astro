@@ -1,0 +1,456 @@
+---
+import { SIGNS } from "../data/dignities";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+import DegreeRuler from "./DegreeRuler.astro";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
+---
+
+<div class="dignities-accordion">
+	{
+		SIGNS.map((s) => (
+			<details name="dignities">
+				<summary>
+					<span class="glyph">{s.symbol}</span>
+					<span class="sign-name">{signName(s.sign)}</span>
+					<span class="chevron" aria-hidden="true">
+						<svg
+							viewBox="0 0 16 16"
+							width="10"
+							height="10"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M3 6 L8 11 L13 6" />
+						</svg>
+					</span>
+				</summary>
+				<div class="body">
+					<div class="pair-row">
+						<div
+							class="cell"
+							style={planetStyle(s.throne)}
+							title={name(s.throne)}
+						>
+							<span class="cell-label">{t.table.throne} +5</span>
+							<span class="glyph">{symbol(s.throne)}</span>
+						</div>
+						{s.exaltation && (
+							<div
+								class="cell"
+								style={planetStyle(s.exaltation.planet)}
+								title={dignityLabel(s.exaltation)}
+							>
+								<span class="cell-label">{t.table.exaltFull} +4</span>
+								<span class="cell-value">
+									<span class="glyph">{symbol(s.exaltation.planet)}</span>
+									{s.exaltation.degree !== undefined && (
+										<sup>{s.exaltation.degree}°</sup>
+									)}
+								</span>
+							</div>
+						)}
+					</div>
+					<section>
+						<h3>{t.table.triplicities} +3</h3>
+						<div class="tri-row">
+							<div
+								class="cell"
+								style={planetStyle(s.triplicity.day)}
+								title={triplicityLabel(s.triplicity.day, "day")}
+							>
+								<span class="cell-label">{t.table.day}</span>
+								<span class="glyph">{symbol(s.triplicity.day)}</span>
+							</div>
+							<div
+								class="cell"
+								style={planetStyle(s.triplicity.night)}
+								title={triplicityLabel(s.triplicity.night, "night")}
+							>
+								<span class="cell-label">{t.table.night}</span>
+								<span class="glyph">{symbol(s.triplicity.night)}</span>
+							</div>
+							<div
+								class="cell"
+								style={planetStyle(s.triplicity.participant)}
+								title={triplicityLabel(s.triplicity.participant, "participant")}
+							>
+								<span class="cell-label">{t.table.participant}</span>
+								<span class="glyph">{symbol(s.triplicity.participant)}</span>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{t.table.terms} +2</h3>
+						<div class="ruler-host">
+							<DegreeRuler lang={lang} entries={s.terms} fullTicks labels />
+						</div>
+					</section>
+					<section>
+						<h3>{t.table.faces} +1</h3>
+						<div class="ruler-host">
+							<DegreeRuler lang={lang} entries={s.faces} fullTicks labels />
+						</div>
+					</section>
+					<div class="pair-row">
+						<div
+							class="cell"
+							style={planetStyle(s.exile)}
+							title={name(s.exile)}
+						>
+							<span class="cell-label">{t.table.exile} −5</span>
+							<span class="glyph">{symbol(s.exile)}</span>
+						</div>
+						{s.fall && (
+							<div
+								class="cell"
+								style={planetStyle(s.fall.planet)}
+								title={dignityLabel(s.fall)}
+							>
+								<span class="cell-label">{t.table.fall} −4</span>
+								<span class="cell-value">
+									<span class="glyph">{symbol(s.fall.planet)}</span>
+									{s.fall.degree !== undefined && <sup>{s.fall.degree}°</sup>}
+								</span>
+							</div>
+						)}
+					</div>
+					<section>
+						<h3>{t.table.almuten}</h3>
+						<div class="ruler-host">
+							<DegreeRuler lang={lang} entries={s.almuten} fullTicks labels />
+						</div>
+					</section>
+				</div>
+			</details>
+		))
+	}
+</div>
+
+<script>
+	// Animate each accordion section's open/close, unless the user has
+	// requested reduced motion — in which case we leave the native
+	// (instant) <details> toggle behaviour untouched.
+	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+	const ANIMATION_OPTIONS: KeyframeAnimationOptions = {
+		duration: 200,
+		easing: "ease-out",
+	};
+	// 1.5rem matches <main>'s top padding in Layout.astro.
+	const MAIN_PADDING = 1.5 * 16;
+
+	interface Item {
+		details: HTMLDetailsElement;
+		summary: HTMLElement;
+		body: HTMLElement;
+		animation: Animation | null;
+		isClosing: boolean;
+		isExpanding: boolean;
+	}
+
+	const items: Item[] = Array.from(
+		document.querySelectorAll<HTMLDetailsElement>(".dignities-accordion details"),
+	)
+		.map((details): Item | null => {
+			const summary = details.querySelector<HTMLElement>("summary");
+			const body = details.querySelector<HTMLElement>(".body");
+			if (!summary || !body) return null;
+			return { details, summary, body, animation: null, isClosing: false, isExpanding: false };
+		})
+		.filter((item): item is Item => item !== null);
+
+	let openItem: Item | null = items.find((item) => item.details.open) ?? null;
+
+	// The shared `name` gives a no-JS exclusive accordion. With JS driving
+	// open/close ourselves (including animating the previously-open item
+	// shut), the native exclusive-group behaviour only gets in the way —
+	// among other things, Chromium scroll-jumps a `name`-grouped <details>
+	// to the viewport center when its open state changes, fighting our own
+	// scroll animation. Drop it for the animated path; reduced motion keeps
+	// the native (instant) grouping.
+	if (!reduceMotion.matches) {
+		items.forEach((item) => item.details.removeAttribute("name"));
+	}
+
+	function headerOffset() {
+		const header = document.querySelector<HTMLElement>(".site-header");
+		return (header?.offsetHeight ?? 0) + MAIN_PADDING;
+	}
+
+	// Where `item`'s summary will end up once `closing` (if any) has
+	// collapsed — used to scroll smoothly from the current position
+	// straight to the post-toggle layout, in one motion.
+	function scrollTarget(item: Item, closing: Item | null) {
+		const top = item.summary.getBoundingClientRect().top + window.scrollY;
+		let shift = 0;
+		if (closing && closing !== item) {
+			const closingIndex = items.indexOf(closing);
+			const itemIndex = items.indexOf(item);
+			if (closingIndex < itemIndex) {
+				shift = closing.details.offsetHeight - closing.summary.offsetHeight;
+			}
+		}
+		return top - shift - headerOffset();
+	}
+
+	items.forEach((item, index) => {
+		const { details, summary } = item;
+
+		// Mouse-focusing a <summary> makes the browser jump-scroll it to the
+		// viewport center, which would yank the page out from under our own
+		// scroll animation. Suppress the focus that mousedown would
+		// otherwise trigger (keyboard activation, which doesn't refocus an
+		// already-focused element, is unaffected).
+		// Pre-empt the browser's own focus handling: focusing a <summary> on
+		// click also scroll-jumps it to the viewport center, fighting our
+		// scroll animation. Focusing it ourselves first (without scrolling)
+		// means the click's default focus is a no-op (already focused), so
+		// it has nothing left to scroll for.
+		summary.addEventListener("pointerdown", () => {
+			summary.focus({ preventScroll: true });
+		});
+
+		summary.addEventListener("click", (event) => {
+			if (reduceMotion.matches) return;
+			event.preventDefault();
+			details.style.overflow = "hidden";
+
+			if (item.isClosing || !details.open) {
+				const previous = openItem !== item ? openItem : null;
+
+				// Scroll directly from the current position to where this
+				// section will land once `previous` (if any) has finished
+				// collapsing — skipped for the very first section, which
+				// is already at the top.
+				if (index > 0) {
+					window.scrollTo({
+						top: scrollTarget(item, previous),
+						behavior: "smooth",
+					});
+				}
+
+				if (previous) {
+					// Close `previous` ourselves, animated.
+					previous.details.style.overflow = "hidden";
+					shrink(previous);
+				}
+				expand(item);
+
+				openItem = item;
+			} else if (item.isExpanding || details.open) {
+				shrink(item);
+				if (openItem === item) openItem = null;
+			}
+		});
+
+		// Reduced-motion path: native instant toggle, so the layout is
+		// already final by the time "toggle" fires.
+		details.addEventListener("toggle", () => {
+			if (!reduceMotion.matches) return;
+			if (details.open) {
+				openItem = item;
+				if (index > 0) {
+					window.scrollTo({ top: scrollTarget(item, null), behavior: "auto" });
+				}
+			} else if (openItem === item) {
+				openItem = null;
+			}
+		});
+	});
+
+	function shrink(item: Item) {
+		item.isClosing = true;
+		const startHeight = `${item.details.offsetHeight}px`;
+		const endHeight = `${item.summary.offsetHeight}px`;
+
+		item.animation?.cancel();
+		item.animation = item.details.animate(
+			{ height: [startHeight, endHeight] },
+			ANIMATION_OPTIONS,
+		);
+		item.animation.onfinish = () => onFinish(item, false);
+		item.animation.oncancel = () => (item.isClosing = false);
+	}
+
+	function expand(item: Item) {
+		item.details.style.height = `${item.details.offsetHeight}px`;
+		item.details.open = true;
+		requestAnimationFrame(() => {
+			item.isExpanding = true;
+			const startHeight = `${item.details.offsetHeight}px`;
+			const endHeight = `${item.summary.offsetHeight + item.body.offsetHeight}px`;
+
+			item.animation?.cancel();
+			item.animation = item.details.animate(
+				{ height: [startHeight, endHeight] },
+				ANIMATION_OPTIONS,
+			);
+			item.animation.onfinish = () => onFinish(item, true);
+			item.animation.oncancel = () => (item.isExpanding = false);
+		});
+	}
+
+	function onFinish(item: Item, open: boolean) {
+		item.details.open = open;
+		item.animation = null;
+		item.isClosing = false;
+		item.isExpanding = false;
+		item.details.style.height = "";
+		item.details.style.overflow = "";
+	}
+</script>
+
+<style>
+	/* Mobile counterpart of the table — shown only below 768px (the table's
+	   .table-wrap carries the mirror-image rule in DignitiesTable.astro). */
+	.dignities-accordion {
+		--border: #a89c8c;
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.dignities-accordion {
+			display: block;
+		}
+	}
+
+	details {
+		border: 1px solid var(--border);
+	}
+
+	details + details {
+		border-top: none;
+	}
+
+	details[open] summary {
+		box-shadow: inset 0 0 10px rgba(193, 104, 74, 0.35);
+	}
+
+	@media (prefers-contrast: more) {
+		details[open] summary {
+			box-shadow: inset 0 0 0 1px #c1684a, inset 0 0 10px rgba(193, 104, 74, 0.35);
+		}
+	}
+
+	summary:focus-visible {
+		outline: 2px solid #c1684a;
+		outline-offset: -2px;
+	}
+
+	summary {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.4rem 0.75rem;
+		background: #f0ebe2;
+		cursor: pointer;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	/* Astronomicon has no bold cut — keep the summary's 600 weight off the
+	   glyph so the browser doesn't synthesize a faux-bold. Fixed width +
+	   centering keeps the following sign name aligned regardless of how
+	   wide each glyph renders. */
+	summary .glyph {
+		display: inline-flex;
+		justify-content: center;
+		width: 1.75rem;
+		font-weight: normal;
+	}
+
+	.chevron {
+		display: inline-flex;
+		margin-left: auto;
+		color: var(--muted);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 1.2;
+		display: inline-block;
+	}
+
+	.body {
+		display: grid;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.75rem;
+	}
+
+	.body [title] {
+		cursor: pointer;
+	}
+
+	.pair-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+
+	/* Signs without an exaltation/fall omit that cell — let the remaining
+	   throne/exile cell take the whole row. */
+	.pair-row .cell:only-child {
+		grid-column: 1 / -1;
+	}
+
+	.tri-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 0.5rem;
+	}
+
+	.cell {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.4rem 0.25rem;
+		border: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.cell-label,
+	section h3 {
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	section h3 {
+		margin: 0 0 0.35rem;
+	}
+
+	.cell sup {
+		font-size: 1em;
+	}
+
+	.ruler-host {
+		position: relative;
+		height: 3.25rem;
+		border: 1px solid var(--border);
+	}
+</style>

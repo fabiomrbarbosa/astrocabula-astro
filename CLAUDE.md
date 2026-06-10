@@ -24,7 +24,19 @@ Currently has one page (Essential Dignities); more reference pages are planned.
   cells/list-items are tinted by `PLANET_COLORS` per the planet they represent
   (see "Color coding" and "Degree rulers" below). A `tfoot` "score row"
   (`.score-row`) shows the point value for each dignity column (see "Scoring
-  row" below).
+  row" below). Also renders `<DignitiesAccordion>` right after `.table-wrap`,
+  so pages get the responsive pair from this one component (see "Mobile
+  accordion" below).
+- `src/components/DignitiesAccordion.astro` — mobile counterpart of the table
+  (shown below 768px; see "Mobile accordion" below).
+- `src/components/DegreeRuler.astro` — shared 0–30° degree-ruler used by both
+  the table's body cells (Terms/Faces/Almuten) and the accordion (see "Degree
+  rulers" below).
+- `src/components/dignities-shared.ts` — helpers shared by the components
+  above: `PLANET_COLORS`, `DEGREE_TICKS`, `symbol()`, `planetStyle()`,
+  `planetsStyle()`, `tickClass()`, plus `makeLabels(lang)` — a factory
+  returning the lang-bound label helpers `{ name, signName, dignityLabel,
+triplicityLabel }` (avoids threading `lang` through every call).
 - `src/data/dignities.ts` — typed data for all 12 signs: throne (domicile),
   exaltation, triplicity (day/night/participant rulers), terms (Egyptian),
   faces (decanates), exile (detriment), fall, almuten by degree range.
@@ -36,7 +48,8 @@ Currently has one page (Essential Dignities); more reference pages are planned.
 
 Transcribed from material the user provided in-conversation (not stored in the
 repo):
-- *Tabela de Dignidades Essenciais* © 2019 Helena Avelar & Luís Ribeiro,
+
+- _Tabela de Dignidades Essenciais_ © 2019 Helena Avelar & Luís Ribeiro,
   Academia de Estudos Astrológicos (PDF table — layout/column structure for the
   dignities table).
 - A companion text reference (`essential_dignities_reference.txt`, not in repo)
@@ -95,6 +108,41 @@ separate legend section (removed from `index.astro`/`pt/index.astro`):
   specificity over the base `table.dignities td { padding: 0 }` rule —
   without it, padding on the score row is silently overridden.
 
+## Mobile accordion
+
+`DignitiesAccordion.astro` replaces the table below 768px — the toggle is
+CSS-only (`@media (max-width: 767px)`: `.table-wrap` hides in
+`DignitiesTable.astro`, `.dignities-accordion` shows in the accordion's own
+styles; both stay in the DOM — static site). It renders inside
+`DignitiesTable.astro` after `.table-wrap`, so pages only ever use
+`<DignitiesTable>`.
+
+- One `<details name="dignities">` per sign — the shared `name` gives native
+  exclusive-open (one sign at a time) with no JS; older browsers degrade to
+  multi-open. The `<summary>` shows the sign glyph + localized name, styled
+  like the table's `thead` (`#f0ebe2`, uppercase 600); `summary .glyph` resets
+  `font-weight: normal` so Astronomicon isn't faux-bolded.
+- Body order: Throne + Exaltation (two-up row), Triplicities (three-up),
+  Terms ruler, Faces ruler, Exile + Fall (two-up row), Almuten ruler.
+  Section labels reuse `t.table.*` with the score appended ("+5"… "−4";
+  Almuten bare) — there's no score row on mobile. Exaltation is spelled in
+  full (`t.table.exaltFull`), unlike the table's abbreviated header.
+- If a sign has no exaltation (or no fall), that cell is omitted and Throne
+  (or Exile) spans the full row (`.cell:only-child { grid-column: 1 / -1 }`) —
+  no "—" placeholder on mobile.
+- Cells follow the table conventions: `planetStyle()` tint on the cell,
+  localized `title` tooltip on the cell, glyphs with no visible text label
+  (the per-cell uppercase label names the dignity, not the planet).
+- The scroll-shadow script in `DignitiesTable.astro` also listens to window
+  `resize` — at mobile width the hidden `.table-wrap` has zero dimensions, so
+  the load-time `update()` is a no-op until a resize back to desktop.
+- The open `<summary>` gets a soft terracotta glow (`details[open] summary`,
+  `box-shadow: inset 0 0 10px rgba(193, 104, 74, 0.35)`, color `#c1684a`) to
+  show which sign is expanded. Under `prefers-contrast: more`, a crisp 1px
+  inset terracotta line is added alongside the glow. The keyboard focus ring
+  on `<summary>` (`:focus-visible`) is also terracotta (`outline: 2px solid
+  #c1684a; outline-offset: -2px`) instead of the browser default blue.
+
 ## UI conventions
 
 - No text labels on sign/planet glyphs in the table — names are shown via the
@@ -151,17 +199,23 @@ Current palette choices (intentional, don't revert without asking):
   excludes them, so `planetStyle()`/`planetsStyle()` return no background for
   node cells (e.g. Gemini/Sagittarius exaltation and Sagittarius fall).
 
-### Degree rulers (Terms & Faces)
+### Degree rulers (`DegreeRuler.astro`)
 
-Both the Terms and Faces columns render a 0–29° horizontal ruler via the
-shared `.ruler` CSS classes (`.ruler`, `.segments`, `.segment`, `.ticks`,
-`.ruler-glyph`), built from `DEGREE_TICKS` (`Array.from({length: 30}, (_, i) => i)`).
-To replicate this pattern for a new degree-based column:
+The Terms, Faces, and Almuten body rulers are one shared component,
+`DegreeRuler.astro` (`entries` prop takes term/face/almuten entries —
+single-`planet` entries are normalized to a `planets` array; almuten ties
+get the `.split` diagonal via `planetsStyle()`). Boolean props: `fullTicks`
+(minor/medium/major ticks at every degree) and `labels` (degree labels at
+each segment's `from`, skipping 0°). The **header** rulers (degree scales in
+`thead`) are a different shape and stay table-local (`.header-ruler` rules
+in `DignitiesTable.astro`).
 
-- The cell (`td.col-X`) must be `position: relative` with an explicit
-  `width`; the `.ruler` div is `position: absolute; inset: 0` so it fills
-  the cell's actual rendered height (percentage heights don't work on
-  `auto`-height table cells, but `inset: 0` absolute positioning does).
+- Host contract: the component root is `.ruler { position: absolute;
+inset: 0 }`, so the **host must be a positioned box with real rendered
+  size** — the table's `td.col-terms`/`col-faces`/`col-almuten` are
+  `position: relative` with explicit column widths (percentage heights don't
+  work on `auto`-height table cells, but `inset: 0` does); the accordion
+  hosts it in `.ruler-host { position: relative; height: 3.25rem }`.
 - `.segments` is `position: absolute; inset: 0; overflow: hidden`. Each
   `.segment` is **absolutely positioned** (`left`/`width` as
   `(value / 30) * 100%`, `box-sizing: border-box`) — not flexbox. Ticks use
@@ -170,23 +224,25 @@ To replicate this pattern for a new degree-based column:
   at any width (flexbox + absolute ticks drift due to differing sub-pixel
   rounding).
 - Tick heights: `.tick.minor` = `0.25rem` (every degree), `.tick.medium` =
-  `0.5rem` (every 5°), `.tick.major` = `100%` (segment-opening ticks). All
-  ticks share one color (`rgba(43, 38, 34, 0.3)`) — majors aren't darker.
-  The 0° tick is always skipped (`DEGREE_TICKS.filter((i) => i > 0)`).
-- Terms: 5 unevenly-sized segments, ticks at every term's `from` degree are
-  `major` and get a `.tick-labels` overlay (degree number, no background,
-  positioned just right of the tick via `translateX(2px)`); `from === 0`
-  isn't labeled.
-- Faces: 3 fixed 10°-wide segments, no labels, and **no minor/medium
-  ticks** — only `major` ticks at 10° and 20° (the decan boundaries).
+  `0.5rem` (every 5°), `.tick.major` = `100%` (segment-opening ticks, via
+  `tickClass()`). All ticks share one color (`rgba(43, 38, 34, 0.3)`) —
+  majors aren't darker. The 0° tick is always skipped
+  (`DEGREE_TICKS.filter((i) => i > 0)`).
+- Table usage: Terms and Almuten get `fullTicks labels`; Faces gets neither —
+  only major ticks at 10°/20° (the decan boundaries; the 10°/20° labels live
+  in the table's header ruler).
+- Accordion usage: Terms, Almuten, **and Faces** all get `fullTicks labels`
+  (there's no header ruler on mobile, so Faces shows its own 10°/20° labels).
 
 ## Verifying changes
 
 No `chromium-cli` / system Playwright available. To screenshot during dev:
+
 ```bash
 cd /tmp && npm install playwright --no-save   # first time only
 npx playwright install chromium               # first time only
 ```
+
 then a small script with `chromium.launch()` → `page.goto('http://localhost:PORT/')`
 → `page.screenshot(...)`. Remember to stop the Astro dev server when done
 (`pkill -f "astro dev"`).

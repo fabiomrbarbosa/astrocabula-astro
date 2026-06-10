@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(npm -v)",
-      "Bash(npm create *)"
+      "Bash(npm create *)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(node -e ' *)",
+      "Bash(node astro-shot.mjs 4322 step2b-desktop)",
+      "Bash(npm run dev > /tmp/astro-dev.log 2>&1 & *)",
+      "Bash(npm run *)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
     ]
   }
 }

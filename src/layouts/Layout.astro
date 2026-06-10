@@ -55,7 +55,10 @@ const t = ui[lang];
 	</head>
 	<body>
 		<header class="site-header">
-			<a class="brand" href={lang === "pt" ? "/pt/" : "/"}>{t.siteName}</a>
+			<a class="brand" href={lang === "pt" ? "/pt/" : "/"}>
+				<span class="brand-full">{t.siteName}</span>
+				<span class="brand-short">{t.siteNameShort}</span>
+			</a>
 			<nav>
 				<a href={lang === "pt" ? "/pt/" : "/"}>{t.nav.dignities}</a>
 				<span class="lang-switcher">
@@ -83,6 +86,12 @@ const t = ui[lang];
 		</main>
 		<footer class="site-footer">
 			<p>{t.footer}</p>
+			<p>
+				{t.builtBy}
+				<a href="https://astrofabio.com" target="_blank" rel="noopener"
+					>Fábio Barbosa</a
+				>
+			</p>
 		</footer>
 		<script is:inline>
 			document.querySelectorAll(".lang-switcher a").forEach(function (a) {
@@ -171,6 +180,13 @@ const t = ui[lang];
 		box-sizing: border-box;
 	}
 
+	html {
+		/* The accordion computes scroll positions itself, accounting for
+		   sections collapsing/expanding above the target — disable native
+		   scroll anchoring so it doesn't double-correct and fight that. */
+		overflow-anchor: none;
+	}
+
 	html,
 	body {
 		margin: 0;
@@ -183,16 +199,33 @@ const t = ui[lang];
 		background: var(--bg);
 		color: var(--fg);
 		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
 	h1 {
 		margin-bottom: 1em;
 		font-weight: normal;
 		letter-spacing: -0.02em;
 	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
 	.site-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--border);
 	}
@@ -203,6 +236,17 @@ const t = ui[lang];
 		color: var(--fg);
 		text-decoration: none;
 		letter-spacing: -0.02em;
+	}
+
+	.brand-short {
+		display: none;
+	}
+
+	.site-header nav {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 
 	.site-header nav a {
@@ -217,7 +261,7 @@ const t = ui[lang];
 
 	.lang-switcher {
 		display: inline-flex;
-		margin-left: 1.5rem;
+		margin-left: 1rem;
 		font-size: 0.85rem;
 		border: 1px solid var(--border);
 		border-radius: 999px;
@@ -252,5 +296,44 @@ const t = ui[lang];
 		padding: 1rem 1.5rem 2.5rem;
 		color: var(--muted);
 		font-size: 0.8rem;
+	}
+
+	.site-footer a {
+		color: var(--accent);
+	}
+
+	.site-footer p + p {
+		margin-top: 0.35rem;
+	}
+
+	@media (max-width: 600px) {
+		.site-header {
+			padding: 0.75rem 1rem;
+		}
+
+		.site-header nav {
+			flex-grow: 1;
+			justify-content: space-between;
+		}
+
+		.brand-full {
+			display: none;
+		}
+
+		.brand-short {
+			display: inline;
+		}
+
+		.site-header .brand {
+			font-size: 1.1rem;
+		}
+
+		.site-header nav a {
+			font-size: 0.85rem;
+		}
+
+		.lang-switcher {
+			margin-left: 0.5rem;
+		}
 	}
 </style>

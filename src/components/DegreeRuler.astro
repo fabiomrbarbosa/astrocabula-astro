@@ -1,0 +1,190 @@
+---
+import type {
+	TermEntry,
+	FaceEntry,
+	AlmutenEntry,
+	Planet,
+} from "../data/dignities";
+import { defaultLang, type Lang } from "../i18n";
+import {
+	DEGREE_TICKS,
+	makeLabels,
+	planetsStyle,
+	symbol,
+	tickClass,
+} from "./dignities-shared";
+
+type RulerEntry = TermEntry | FaceEntry | AlmutenEntry;
+
+interface Props {
+	lang?: Lang;
+	entries: RulerEntry[];
+	/** Minor/medium/major ticks at every degree (Terms, Almuten); otherwise
+	 *  only major ticks at segment boundaries (Faces). */
+	fullTicks?: boolean;
+	/** Degree labels at each segment's `from` (skipping 0°). */
+	labels?: boolean;
+}
+
+const {
+	lang = defaultLang,
+	entries,
+	fullTicks = false,
+	labels = false,
+} = Astro.props;
+const { name } = makeLabels(lang);
+
+function planetsOf(e: RulerEntry): Planet[] {
+	return "planets" in e ? e.planets : [e.planet];
+}
+---
+
+<!-- The host element must be `position: relative` with a real rendered
+     height/width — the ruler fills it via `inset: 0`. -->
+<div class="ruler">
+	<div class="segments">
+		{
+			entries.map((e) => {
+				const planets = planetsOf(e);
+				return (
+					<div
+						class={`segment${planets.length > 1 ? " split" : ""}`}
+						style={`left: ${(e.from / 30) * 100}%; width: ${((e.to - e.from + 1) / 30) * 100}%; ${planetsStyle(planets) ?? ""}`}
+						title={`${planets.map((p) => name(p)).join(" / ")} ${e.from}°–${e.to}°59′`}
+					>
+						<span class="planets">
+							{planets.map((p) => (
+								<span class="ruler-glyph">{symbol(p)}</span>
+							))}
+						</span>
+					</div>
+				);
+			})
+		}
+	</div>
+	<div class="ticks">
+		{
+			fullTicks
+				? DEGREE_TICKS.filter((i) => i > 0).map((i) => (
+						<span
+							class={`tick ${tickClass(i, entries)}`}
+							style={`left: ${(i / 30) * 100}%`}
+						/>
+					))
+				: entries
+						.filter((e) => e.from > 0)
+						.map((e) => (
+							<span
+								class="tick major"
+								style={`left: ${(e.from / 30) * 100}%`}
+							/>
+						))
+		}
+	</div>
+	{
+		labels && (
+			<div class="tick-labels">
+				{entries
+					.filter((e) => e.from > 0)
+					.map((e) => (
+						<span class="tick-label" style={`left: ${(e.from / 30) * 100}%`}>
+							{String(e.from).padStart(2, "0")}°
+						</span>
+					))}
+			</div>
+		)
+	}
+</div>
+
+<style>
+	.ruler {
+		--tick-spacing: 0.25rem;
+		position: absolute;
+		inset: 0;
+		font-size: 0.75rem;
+	}
+
+	.segments {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.segment {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.segment[title] {
+		cursor: pointer;
+	}
+
+	.segment.split::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: var(--split-color);
+		clip-path: polygon(0 100%, 100% 100%, 100% 0%);
+	}
+
+	.planets {
+		display: inline-flex;
+		gap: 0.2rem;
+	}
+
+	.ruler-glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 1;
+		display: inline-block;
+		position: relative;
+		z-index: 1;
+	}
+
+	.ticks {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+
+	.tick {
+		position: absolute;
+		top: 0;
+		width: 1px;
+		background: rgba(43, 38, 34, 0.3);
+	}
+
+	.tick.minor {
+		height: var(--tick-spacing);
+	}
+
+	.tick.medium {
+		height: 0.5rem;
+	}
+
+	.tick.major {
+		height: 100%;
+	}
+
+	.tick-labels {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: var(--tick-spacing);
+		height: 0.75rem;
+		line-height: 1;
+		color: var(--fg);
+		pointer-events: none;
+	}
+
+	.tick-label {
+		position: absolute;
+		transform: translateX(var(--tick-spacing));
+		white-space: nowrap;
+	}
+</style>
