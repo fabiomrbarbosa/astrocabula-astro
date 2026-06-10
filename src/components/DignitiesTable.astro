@@ -178,6 +178,20 @@ function tickClass(degree: number, terms: { from: number }[]) {
 				</th>
 			</tr>
 		</thead>
+		<tfoot>
+			<tr class="score-row">
+				<td class="col-sign">{t.table.score}</td>
+				<td class="col-throne">+5</td>
+				<td class="col-exalt">+4</td>
+				<td class="col-triplicity sub" colspan="3">+3</td>
+				<td class="col-terms">+2</td>
+				<td class="col-faces">+1</td>
+				<td class="col-exile">−5</td>
+				<td class="col-fall">−4</td>
+				<td class="col-almuten">{t.table.almuten}</td>
+				<td class="col-sign-end">{t.table.score}</td>
+			</tr>
+		</tfoot>
 		<tbody>
 			{
 				SIGNS.map((s) => (
@@ -400,7 +414,6 @@ function tickClass(degree: number, terms: { from: number }[]) {
 		font-weight: 600;
 		font-size: 0.8rem;
 		text-transform: uppercase;
-		letter-spacing: 0.04em;
 	}
 
 	thead th.sub {
@@ -642,6 +655,17 @@ function tickClass(degree: number, terms: { from: number }[]) {
 
 	tbody tr:nth-child(even) {
 		background: #f5f0e8;
+	}
+
+	table.dignities tfoot td {
+		padding: 1rem 0.5rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		background: #f0ebe2;
+	}
+
+	.score-row {
+		text-transform: uppercase;
 	}
 </style>
 

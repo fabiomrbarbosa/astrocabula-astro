@@ -14,16 +14,20 @@ Currently has one page (Essential Dignities); more reference pages are planned.
 
 - `src/layouts/Layout.astro` — shared page shell: header with site nav (add new
   pages' links here), footer with data attribution, global CSS (`:root`
-  variables for colors, the `Astronomicon` `@font-face`).
+  variables for colors, the `Astronomicon` and `Reforma1918` `@font-face`
+  declarations).
 - `src/components/DignitiesTable.astro` — renders the essential dignities table
   from `src/data/dignities.ts`. Rows alternate neutral shades (zebra striping);
   cells/list-items are tinted by `PLANET_COLORS` per the planet they represent
-  (see "Color coding" and "Degree rulers" below).
+  (see "Color coding" and "Degree rulers" below). A `tfoot` "score row"
+  (`.score-row`) shows the point value for each dignity column (see "Scoring
+  row" below).
 - `src/data/dignities.ts` — typed data for all 12 signs: throne (domicile),
   exaltation, triplicity (day/night/participant rulers), terms (Egyptian),
   faces (decanates), exile (detriment), fall, almuten by degree range.
-- `src/pages/index.astro` — homepage, uses `Layout` + `DignitiesTable` + a
-  scoring legend.
+- `src/pages/index.astro` (and `src/pages/pt/index.astro`) — homepage, uses
+  `Layout` + `DignitiesTable`. No intro paragraph or separate scoring legend —
+  the score row in the table covers that.
 
 ## Data sources
 
@@ -62,6 +66,32 @@ loaded via `@font-face` in `Layout.astro` and applied to `.glyph` spans in
 these letters — don't revert to Unicode astrological symbols (they render as
 colored emoji in some browsers, which was the original problem this solved).
 
+## Reforma1918 font
+
+`public/fonts/Reforma1918/*.woff2` (Blanca/Gris/Negra weights, each with an
+italic) is the site-wide body font, declared via `@font-face` in
+`Layout.astro` and listed first in `body { font-family: ... }` (falls back to
+Iowan Old Style → Georgia → serif). Weight mapping: Blanca = 300, Gris =
+normal, Negra = bold.
+
+## Scoring row
+
+`DignitiesTable.astro` renders a `tfoot` row (`tr.score-row`) below the sign
+rows, showing the point value for each dignity type instead of the old
+separate legend section (removed from `index.astro`/`pt/index.astro`):
+
+- Throne +5, Exalt +4, Triplicities (single `colspan="3"` cell) +3, Terms +2,
+  Faces +1, Exile −5, Fall −4.
+- Almuten has no score — its cell shows the `t.table.almuten` label instead of
+  a value.
+- Both sticky sign columns (`col-sign`, `col-sign-end`) show the
+  `t.table.score` label ("Score" / "Pontos").
+- `.score-row` is `text-transform: uppercase` as a whole (covers the labels;
+  has no effect on the numeric/symbol cells).
+- `table.dignities tfoot td` needs the `table.dignities` prefix to win
+  specificity over the base `table.dignities td { padding: 0 }` rule —
+  without it, padding on the score row is silently overridden.
+
 ## UI conventions
 
 - No text labels on sign/planet glyphs in the table — names are shown via the
@@ -71,6 +101,12 @@ colored emoji in some browsers, which was the original problem this solved).
   `td.col-terms { width: 20rem }`). Headers (`th`) keep normal padding.
 - Sign rows alternate background via `tbody tr:nth-child(even)` (a neutral
   `#f2ede4`) — no element-based (Fire/Earth/Air/Water) row tinting anymore.
+- `--accent` (`Layout.astro` `:root`) is a neutral warm grey (`#5c5347`), not a
+  bright/purple accent — keep header/nav colors restrained. The header brand
+  (home) link uses `--fg` (plain text color), not `--accent`. The lang
+  switcher (`.lang-switcher`) is a single pill (`border-radius: 999px`,
+  `overflow: hidden`) with the active language as a filled `--accent`
+  segment — don't go back to per-link borders.
 
 ### Color coding (`PLANET_COLORS`)
 

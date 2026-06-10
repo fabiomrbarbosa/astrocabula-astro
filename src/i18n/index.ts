@@ -18,8 +18,6 @@ export const ui = {
 		},
 		page: {
 			title: 'Essential Dignities',
-			intro:
-				'Throne (domicile), exaltation, triplicities, terms, faces, detriment, fall, and almuten for each planet by sign, following the Egyptian terms and the day/night/participant triplicity rulers.',
 		},
 		table: {
 			sign: 'Sign',
@@ -34,16 +32,7 @@ export const ui = {
 			exile: 'Exile',
 			fall: 'Fall',
 			almuten: 'Almuten',
-		},
-		legend: {
-			title: 'Scoring',
-			domicile: 'Domicile / Throne',
-			exaltation: 'Exaltation',
-			triplicity: 'Triplicity (each ruler)',
-			term: 'Term',
-			face: 'Face',
-			exile: 'Detriment / Exile',
-			fall: 'Fall / Debility',
+			score: 'Score',
 		},
 		footer:
 			'Dignities data adapted from Tabela de Dignidades Essenciais © 2019 Helena Avelar & Luís Ribeiro, Academia de Estudos Astrológicos.',
@@ -55,8 +44,6 @@ export const ui = {
 		},
 		page: {
 			title: 'Dignidades Essenciais',
-			intro:
-				'Domicílio (trono), exaltação, triplicidades, termos, faces, exílio, queda e almuten para cada planeta por signo, segundo os termos egípcios e os regentes de triplicidade diurno, noturno e participante.',
 		},
 		table: {
 			sign: 'Signo',
@@ -71,16 +58,7 @@ export const ui = {
 			exile: 'Exílio',
 			fall: 'Queda',
 			almuten: 'Almuten',
-		},
-		legend: {
-			title: 'Pontuação',
-			domicile: 'Domicílio / Trono',
-			exaltation: 'Exaltação',
-			triplicity: 'Triplicidade (cada regente)',
-			term: 'Termo',
-			face: 'Face',
-			exile: 'Exílio',
-			fall: 'Queda',
+			score: 'Pontos',
 		},
 		footer:
 			'Dados de dignidades adaptados da Tabela de Dignidades Essenciais © 2019 Helena Avelar e Luís Ribeiro, Academia de Estudos Astrológicos.',

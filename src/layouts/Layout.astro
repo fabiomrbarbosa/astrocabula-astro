@@ -1,5 +1,5 @@
 ---
-import { ui, defaultLang, HTML_LANG, type Lang } from '../i18n';
+import { ui, defaultLang, HTML_LANG, type Lang } from "../i18n";
 
 interface Props {
 	title: string;
@@ -20,30 +20,30 @@ const t = ui[lang];
 		<title>{title} · {t.siteName}</title>
 		<script is:inline>
 			(function () {
-				var STORAGE_KEY = 'astrocabula-lang';
+				var STORAGE_KEY = "astrocabula-lang";
 				var path = window.location.pathname;
-				var isPt = path === '/pt' || path.indexOf('/pt/') === 0;
+				var isPt = path === "/pt" || path.indexOf("/pt/") === 0;
 				var stored = localStorage.getItem(STORAGE_KEY);
 				var target = null;
 
-				if (stored === 'pt' && !isPt) {
-					target = '/pt' + path;
-				} else if (stored === 'en' && isPt) {
-					target = path.replace(/^\/pt/, '') || '/';
+				if (stored === "pt" && !isPt) {
+					target = "/pt" + path;
+				} else if (stored === "en" && isPt) {
+					target = path.replace(/^\/pt/, "") || "/";
 				} else if (!stored) {
 					var browserPt = (navigator.languages || [navigator.language]).some(
 						function (l) {
-							return l.toLowerCase().indexOf('pt') === 0;
-						}
+							return l.toLowerCase().indexOf("pt") === 0;
+						},
 					);
 					if (browserPt && !isPt) {
-						localStorage.setItem(STORAGE_KEY, 'pt');
-						target = '/pt' + path;
+						localStorage.setItem(STORAGE_KEY, "pt");
+						target = "/pt" + path;
 					} else if (!browserPt && isPt) {
-						localStorage.setItem(STORAGE_KEY, 'en');
-						target = path.replace(/^\/pt/, '') || '/';
+						localStorage.setItem(STORAGE_KEY, "en");
+						target = path.replace(/^\/pt/, "") || "/";
 					} else {
-						localStorage.setItem(STORAGE_KEY, browserPt ? 'pt' : 'en');
+						localStorage.setItem(STORAGE_KEY, browserPt ? "pt" : "en");
 					}
 				}
 
@@ -55,23 +55,23 @@ const t = ui[lang];
 	</head>
 	<body>
 		<header class="site-header">
-			<a class="brand" href={lang === 'pt' ? '/pt/' : '/'}>{t.siteName}</a>
+			<a class="brand" href={lang === "pt" ? "/pt/" : "/"}>{t.siteName}</a>
 			<nav>
-				<a href={lang === 'pt' ? '/pt/' : '/'}>{t.nav.dignities}</a>
+				<a href={lang === "pt" ? "/pt/" : "/"}>{t.nav.dignities}</a>
 				<span class="lang-switcher">
 					<a
 						href="/"
-						class={lang === 'en' ? 'active' : ''}
+						class={lang === "en" ? "active" : ""}
 						data-lang="en"
-						aria-current={lang === 'en' ? 'true' : undefined}
+						aria-current={lang === "en" ? "true" : undefined}
 					>
 						EN
 					</a>
 					<a
 						href="/pt/"
-						class={lang === 'pt' ? 'active' : ''}
+						class={lang === "pt" ? "active" : ""}
 						data-lang="pt"
-						aria-current={lang === 'pt' ? 'true' : undefined}
+						aria-current={lang === "pt" ? "true" : undefined}
 					>
 						PT
 					</a>
@@ -85,9 +85,9 @@ const t = ui[lang];
 			<p>{t.footer}</p>
 		</footer>
 		<script is:inline>
-			document.querySelectorAll('.lang-switcher a').forEach(function (a) {
-				a.addEventListener('click', function () {
-					localStorage.setItem('astrocabula-lang', a.dataset.lang || 'en');
+			document.querySelectorAll(".lang-switcher a").forEach(function (a) {
+				a.addEventListener("click", function () {
+					localStorage.setItem("astrocabula-lang", a.dataset.lang || "en");
 				});
 			});
 		</script>
@@ -96,10 +96,60 @@ const t = ui[lang];
 
 <style is:global>
 	@font-face {
-		font-family: 'Astronomicon';
-		src: url('/fonts/Astronomicon.ttf') format('truetype');
+		font-family: "Astronomicon";
+		src: url("/fonts/Astronomicon.ttf") format("truetype");
 		font-weight: normal;
 		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-Blanca.woff2") format("woff2");
+		font-weight: 300;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-BlancaItalica.woff2")
+			format("woff2");
+		font-weight: 300;
+		font-style: italic;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-Gris.woff2") format("woff2");
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-GrisItalica.woff2") format("woff2");
+		font-weight: normal;
+		font-style: italic;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-Negra.woff2") format("woff2");
+		font-weight: bold;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: "Reforma1918";
+		src: url("/fonts/Reforma1918/Reforma1918-NegraItalica.woff2")
+			format("woff2");
+		font-weight: bold;
+		font-style: italic;
 		font-display: swap;
 	}
 
@@ -109,7 +159,7 @@ const t = ui[lang];
 		--fg: #2b2622;
 		--muted: #756d64;
 		--border: #c9bdac;
-		--accent: #6b4f9e;
+		--accent: #5c5347;
 
 		--fire: #f6e1d8;
 		--earth: #e3ecd8;
@@ -128,12 +178,17 @@ const t = ui[lang];
 	}
 
 	body {
-		font-family: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+		font-family:
+			"Reforma1918", "Iowan Old Style", Georgia, "Times New Roman", serif;
 		background: var(--bg);
 		color: var(--fg);
 		line-height: 1.5;
 	}
-
+	h1 {
+		margin-bottom: 1em;
+		font-weight: normal;
+		letter-spacing: -0.02em;
+	}
 	.site-header {
 		display: flex;
 		align-items: center;
@@ -145,15 +200,14 @@ const t = ui[lang];
 	.site-header .brand {
 		font-weight: bold;
 		font-size: 1.25rem;
-		color: var(--accent);
+		color: var(--fg);
 		text-decoration: none;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.02em;
 	}
 
 	.site-header nav a {
 		color: var(--fg);
 		text-decoration: none;
-		margin-left: 1.5rem;
 		font-size: 0.95rem;
 	}
 
@@ -165,14 +219,14 @@ const t = ui[lang];
 		display: inline-flex;
 		margin-left: 1.5rem;
 		font-size: 0.85rem;
-		gap: 0.25rem;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		overflow: hidden;
 	}
 
 	.lang-switcher a {
 		margin-left: 0;
-		padding: 0.1rem 0.35rem;
-		border: 1px solid var(--border);
-		border-radius: 4px;
+		padding: 0.2rem 0.65rem;
 		color: var(--muted);
 	}
 
@@ -182,13 +236,12 @@ const t = ui[lang];
 	}
 
 	.lang-switcher a.active {
-		color: var(--accent);
-		border-color: var(--accent);
+		background: var(--accent);
+		color: var(--bg);
 		font-weight: bold;
 	}
 
 	main {
-		max-width: 1200px;
 		margin: 0 auto;
 		padding: 1.5rem;
 	}
