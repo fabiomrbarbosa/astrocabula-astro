@@ -163,13 +163,22 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 	}
 
 	const items: Item[] = Array.from(
-		document.querySelectorAll<HTMLDetailsElement>(".dignities-accordion details"),
+		document.querySelectorAll<HTMLDetailsElement>(
+			".dignities-accordion details",
+		),
 	)
 		.map((details): Item | null => {
 			const summary = details.querySelector<HTMLElement>("summary");
 			const body = details.querySelector<HTMLElement>(".body");
 			if (!summary || !body) return null;
-			return { details, summary, body, animation: null, isClosing: false, isExpanding: false };
+			return {
+				details,
+				summary,
+				body,
+				animation: null,
+				isClosing: false,
+				isExpanding: false,
+			};
 		})
 		.filter((item): item is Item => item !== null);
 
@@ -336,11 +345,6 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 		border-top: none;
 	}
 
-	summary:focus-visible {
-		outline: 2px solid #c1684a;
-		outline-offset: -2px;
-	}
-
 	summary {
 		list-style: none;
 		display: flex;
@@ -361,6 +365,12 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 	details[open] summary,
 	summary:focus-visible {
 		background: #f7f4ee;
+	}
+
+	.dignities-accordion *,
+	.dignities-accordion *:focus-visible {
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	/* Astronomicon has no bold cut — keep the summary's 600 weight off the
@@ -438,6 +448,7 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 		right: 0.25rem;
 		bottom: 0.25rem;
 		line-height: 1;
+		font-family: Georgia, Times, serif;
 	}
 
 	.cell-label,

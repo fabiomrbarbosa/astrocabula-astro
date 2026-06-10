@@ -274,7 +274,7 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 	}
 
 	.sticky-shadow-start {
-		left: var(--cell-min-width);
+		left: calc(var(--cell-min-width) - 1px);
 		background: linear-gradient(to right, rgba(43, 38, 34, 0.25), transparent);
 	}
 
@@ -389,7 +389,15 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 		position: sticky;
 		left: 0;
 		z-index: 2;
-		border-right: 1px solid var(--border);
+	}
+
+	/* border-collapse doesn't carry the col-throne border-left along with
+	   the sticky col-sign cell as it scrolls — re-paint it as a box-shadow
+	   on col-sign itself once scrolled (avoids a double border when not
+	   scrolled, where the collapsed border already shows). */
+	.table-wrap.scrolled th.col-sign,
+	.table-wrap.scrolled td.col-sign {
+		box-shadow: inset -1px 0 0 0 var(--border);
 	}
 
 	td.col-sign {
@@ -415,7 +423,15 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 		   column and the scroll container's edge under border-collapse. */
 		right: -1px;
 		z-index: 2;
-		border-left: 1px solid var(--border);
+	}
+
+	/* border-collapse doesn't carry the col-almuten border-right along with
+	   the sticky col-sign-end cell as it scrolls — re-paint it as a
+	   box-shadow on col-sign-end itself once scrolled (avoids a double
+	   border when not scrolled, where the collapsed border already shows). */
+	.table-wrap.scrolled-end th.col-sign-end,
+	.table-wrap.scrolled-end td.col-sign-end {
+		box-shadow: inset 1px 0 0 0 var(--border);
 	}
 
 	td.col-sign-end {

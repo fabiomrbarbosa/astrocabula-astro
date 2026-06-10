@@ -120,7 +120,8 @@ class and styling as the triplicities' D/N/P labels — and its tooltip becomes
 planet name. Implemented in both `DignitiesTable.astro` (`td.col-throne`,
 added to the `position: relative` cell list) and `DignitiesAccordion.astro`
 (`.cell`, now `position: relative`, with its own `.tri-label` using fixed
-`0.25rem` offsets instead of the table's `--tick-spacing`). The English
+`0.25rem` offsets instead of the table's `--tick-spacing`, and `font-family:
+Georgia, Times, serif` so the "J" doesn't pick up Reforma1918). The English
 "Throne" header/label was renamed to "Ruler" (`t.table.throne`); Portuguese
 stays "Trono".
 
@@ -152,13 +153,13 @@ styles; both stay in the DOM — static site). It renders inside
 - The scroll-shadow script in `DignitiesTable.astro` also listens to window
   `resize` — at mobile width the hidden `.table-wrap` has zero dimensions, so
   the load-time `update()` is a no-op until a resize back to desktop.
-- The keyboard focus ring on `<summary>` (`:focus-visible`) is terracotta
-  (`outline: 2px solid #c1684a; outline-offset: -2px`) instead of the browser
-  default blue — the open/closed state itself is shown only by the chevron
-  rotation, with no extra outline/glow on the open `<summary>`.
 - `details[open] summary` and `summary:focus-visible` both get a lighter
   neutral background (`#f7f4ee`, vs. the default `#f0ebe2`) — a subtle hint
-  for which sign is open/focused, on top of the chevron and focus outline.
+  for which sign is open/focused, alongside the chevron rotation.
+- `.dignities-accordion *` has `outline: none` and
+  `-webkit-tap-highlight-color: transparent` — no browser focus/tap outline
+  anywhere in the accordion (summary, cells, ruler segments, etc.); the
+  lighter background above is the only focus/open indicator.
 
 ## UI conventions
 
@@ -190,7 +191,18 @@ styles; both stay in the DOM — static site). It renders inside
   share `grid-area: 1 / 1`), not `box-shadow` on the sticky cells — gradient
   overlays positioned at the sticky column edges, faded in via
   `.table-wrap.scrolled` / `.scrolled-end` (toggled by the existing scroll
-  listener script).
+  listener script). `.sticky-shadow-start`'s `left` and `.sticky-shadow-end`'s
+  `right` are both `calc(var(--cell-min-width) - 1px)`, to align with the
+  inset box-shadow borders below (not `var(--cell-min-width)` — that would
+  leave a 1px gap).
+- `border-collapse` doesn't carry a cell's collapsed border along when it
+  becomes sticky and scrolls — the border stays with the (non-sticky)
+  neighboring cell and scrolls out of view. So `th/td.col-sign` and
+  `th/td.col-sign-end` get an extra `inset box-shadow` border on their inner
+  edge (`-1px`/`1px` respectively) to "carry" that border, but **only**
+  while `.table-wrap.scrolled` / `.scrolled-end` is set — otherwise it'd
+  double up with the collapsed border from `col-throne`/`col-almuten`, which
+  is still visible (and aligned) when not scrolled.
 
 ### Color coding (`PLANET_COLORS`)
 
