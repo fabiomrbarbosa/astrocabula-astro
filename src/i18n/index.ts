@@ -1,4 +1,4 @@
-import type { Planet } from "../data/dignities";
+import type { Element, Planet } from "../data/dignities";
 
 export const LANGS = ["en", "pt"] as const;
 export type Lang = (typeof LANGS)[number];
@@ -17,12 +17,16 @@ export const ui = {
 		nav: {
 			dignities: "Essential Dignities",
 			planets: "Planetary Attributes",
+			signs: "Sign Attributes",
 		},
 		page: {
 			title: "Essential Dignities",
 		},
 		planetsPage: {
 			title: "Planetary Attributes",
+		},
+		signsPage: {
+			title: "Sign Attributes",
 		},
 		table: {
 			sign: "Sign",
@@ -71,6 +75,33 @@ export const ui = {
 			sectionYears: "Planetary Years",
 			sectionRulerships: "Rulerships",
 		},
+		signsTable: {
+			sign: "Sign",
+			qualities: "Qualities",
+			element: "Element",
+			temperament: "Temperament",
+			gender: "Gender",
+			sect: "Sect",
+			mode: "Mode",
+			season: "Season",
+			ruler: "Ruler",
+			exaltation: "Exaltation",
+			triplicities: "Triplicities",
+			terms: "Terms (Egyptian)",
+			faces: "Faces",
+			behavior: "Behavior",
+			voice: "Voice",
+			fertility: "Fertility",
+			flavor: "Flavors",
+			direction: "Directions",
+			ascension: "Ascension",
+			latitude: "Latitude",
+			commandObey: "Command/Obedience",
+			solarLunar: "Solar/Lunar",
+			sectionNature: "Nature",
+			sectionPlanets: "Planets",
+			sectionAttributes: "Attributes",
+		},
 		weekdays: [
 			"Sunday",
 			"Monday",
@@ -90,12 +121,16 @@ export const ui = {
 		nav: {
 			dignities: "Dignidades Essenciais",
 			planets: "Atributos dos Planetas",
+			signs: "Atributos dos Signos",
 		},
 		page: {
 			title: "Dignidades Essenciais",
 		},
 		planetsPage: {
 			title: "Atributos dos Planetas",
+		},
+		signsPage: {
+			title: "Atributos dos Signos",
 		},
 		table: {
 			sign: "Signo",
@@ -143,6 +178,33 @@ export const ui = {
 			sectionCycles: "Ciclos",
 			sectionYears: "Anos Planetários",
 			sectionRulerships: "Regências",
+		},
+		signsTable: {
+			sign: "Signo",
+			qualities: "Qualidades",
+			element: "Elemento",
+			temperament: "Temperamento",
+			gender: "Género",
+			sect: "Facção",
+			mode: "Modo",
+			season: "Estação do Ano",
+			ruler: "Regente",
+			exaltation: "Exaltação",
+			triplicities: "Triplicidades",
+			terms: "Termos (Egípcios)",
+			faces: "Faces",
+			behavior: "Comportamento",
+			voice: "Voz",
+			fertility: "Fertilidade",
+			flavor: "Sabores",
+			direction: "Direcções",
+			ascension: "Ascensão",
+			latitude: "Latitude",
+			commandObey: "Comando/Obediência",
+			solarLunar: "Solar/Lunar",
+			sectionNature: "Natureza",
+			sectionPlanets: "Planetas",
+			sectionAttributes: "Atributos",
 		},
 		weekdays: [
 			"Domingo",
@@ -213,5 +275,20 @@ export const SIGN_NAMES_I18N: Record<Lang, Record<string, string>> = {
 		Capricorn: "Capricórnio",
 		Aquarius: "Aquário",
 		Pisces: "Peixes",
+	},
+};
+
+export const ELEMENT_NAMES_I18N: Record<Lang, Record<Element, string>> = {
+	en: {
+		Fire: "Fire",
+		Earth: "Earth",
+		Air: "Air",
+		Water: "Water",
+	},
+	pt: {
+		Fire: "Fogo",
+		Earth: "Terra",
+		Air: "Ar",
+		Water: "Água",
 	},
 };

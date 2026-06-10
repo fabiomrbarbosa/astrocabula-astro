@@ -8,7 +8,8 @@
       "Bash(node -e ' *)",
       "Bash(node astro-shot.mjs 4322 step2b-desktop)",
       "Bash(npm run dev > /tmp/astro-dev.log 2>&1 & *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git commit -m 'Add Planetary Attributes page with table/accordion views and shared accordion animation *)"
     ],
     "additionalDirectories": [
       "/private/tmp"

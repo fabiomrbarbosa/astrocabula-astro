@@ -1,0 +1,355 @@
+---
+import { SIGN_ATTRIBUTES } from "../data/signs";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+import { dignitiesOf, elementStyle, makeSignsLabels } from "./signs-shared";
+import DegreeRuler from "./DegreeRuler.astro";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const st = t.signsTable;
+const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
+const { text, elementName } = makeSignsLabels(lang);
+
+const ROWS = SIGN_ATTRIBUTES.map((a) => ({ a, d: dignitiesOf(a.sign) }));
+---
+
+<div class="signs-accordion">
+	{
+		ROWS.map(({ a, d }) => (
+			<details name="signs">
+				<summary>
+					<span class="glyph" style={elementStyle(d.element)}>
+						{d.symbol}
+					</span>
+					<span class="sign-name">{signName(d.sign)}</span>
+					<span class="chevron" aria-hidden="true">
+						<svg
+							viewBox="0 0 16 16"
+							width="10"
+							height="10"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M3 6 L8 11 L13 6" />
+						</svg>
+					</span>
+				</summary>
+				<div class="body">
+					<section>
+						<h3>{st.sectionNature}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{st.qualities}</span>
+								<span class="cell-value">{text(a.qualities)}</span>
+							</div>
+							<div class="cell" style={elementStyle(d.element)}>
+								<span class="cell-label">{st.element}</span>
+								<span class="cell-value">{elementName(d.element)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.temperament}</span>
+								<span class="cell-value">{text(a.temperament)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.gender}</span>
+								<span class="cell-value">{text(a.gender)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.sect}</span>
+								<span class="cell-value">{text(a.sect)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.mode}</span>
+								<span class="cell-value">{text(a.mode)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.season}</span>
+								<span class="cell-value">{text(a.season)}</span>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{st.sectionPlanets}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{st.ruler}</span>
+								<div class="planet-chips">
+									<span
+										class="chip"
+										style={planetStyle(d.throne)}
+										title={name(d.throne)}
+									>
+										<span class="glyph">{symbol(d.throne)}</span>
+									</span>
+								</div>
+							</div>
+							{d.exaltation && (
+								<div class="cell">
+									<span class="cell-label">{st.exaltation}</span>
+									<div class="planet-chips">
+										<span
+											class="chip"
+											style={planetStyle(d.exaltation.planet)}
+											title={dignityLabel(d.exaltation)}
+										>
+											<span class="glyph">{symbol(d.exaltation.planet)}</span>
+										</span>
+									</div>
+								</div>
+							)}
+							<div class="cell full">
+								<span class="cell-label">{st.triplicities}</span>
+								<div class="planet-chips">
+									<span
+										class="chip"
+										style={planetStyle(d.triplicity.day)}
+										title={triplicityLabel(d.triplicity.day, "day")}
+									>
+										<span class="glyph">{symbol(d.triplicity.day)}</span>
+									</span>
+									<span
+										class="chip"
+										style={planetStyle(d.triplicity.night)}
+										title={triplicityLabel(d.triplicity.night, "night")}
+									>
+										<span class="glyph">{symbol(d.triplicity.night)}</span>
+									</span>
+									<span
+										class="chip"
+										style={planetStyle(d.triplicity.participant)}
+										title={triplicityLabel(d.triplicity.participant, "participant")}
+									>
+										<span class="glyph">
+											{symbol(d.triplicity.participant)}
+										</span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{st.terms}</h3>
+						<div class="ruler-host">
+							<DegreeRuler lang={lang} entries={d.terms} fullTicks labels />
+						</div>
+					</section>
+					<section>
+						<h3>{st.faces}</h3>
+						<div class="ruler-host">
+							<DegreeRuler lang={lang} entries={d.faces} fullTicks labels />
+						</div>
+					</section>
+					<section>
+						<h3>{st.sectionAttributes}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{st.behavior}</span>
+								<span class="cell-value multiline">{text(a.behavior)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.voice}</span>
+								<span class="cell-value">{text(a.voice)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.fertility}</span>
+								<span class="cell-value">{text(a.fertility)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.flavor}</span>
+								<span class="cell-value">{text(a.flavor)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.direction}</span>
+								<span class="cell-value">{text(a.direction)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.ascension}</span>
+								<span class="cell-value">{text(a.ascension)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.latitude}</span>
+								<span class="cell-value">{text(a.latitude)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.commandObey}</span>
+								<span class="cell-value">{text(a.commandObey)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{st.solarLunar}</span>
+								<span class="cell-value">{text(a.solarLunar)}</span>
+							</div>
+						</div>
+					</section>
+				</div>
+			</details>
+		))
+	}
+</div>
+
+<script>
+	import { setupAccordionAnimation } from "./accordion-animation";
+
+	setupAccordionAnimation(".signs-accordion");
+</script>
+
+<style>
+	/* Mobile counterpart of SignsTable — shown only below 768px (the table's
+	   .table-wrap carries the mirror-image rule). */
+	.signs-accordion {
+		--border: #a89c8c;
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.signs-accordion {
+			display: block;
+		}
+	}
+
+	details {
+		border: 1px solid var(--border);
+	}
+
+	details + details {
+		border-top: none;
+	}
+
+	summary {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.4rem 0.75rem;
+		background: #f0ebe2;
+		cursor: pointer;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	details[open] summary,
+	summary:focus-visible {
+		background: #f7f4ee;
+	}
+
+	.signs-accordion *,
+	.signs-accordion *:focus-visible {
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	/* Astronomicon has no bold cut — keep the summary's 600 weight off the
+	   glyph so the browser doesn't synthesize a faux-bold. */
+	summary .glyph {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		font-weight: normal;
+		font-size: 1.25rem;
+	}
+
+	.chevron {
+		display: inline-flex;
+		margin-left: auto;
+		color: var(--muted);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 1.2;
+		display: inline-block;
+	}
+
+	.body {
+		display: grid;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.75rem;
+	}
+
+	.body [title] {
+		cursor: pointer;
+	}
+
+	section h3 {
+		margin: 0 0 0.35rem;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	.fields-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+
+	.cell {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.4rem 0.25rem;
+		border: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.cell.full {
+		grid-column: 1 / -1;
+	}
+
+	.cell-label {
+		font-weight: 600;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+	}
+
+	.cell-value.multiline {
+		white-space: pre-line;
+	}
+
+	.ruler-host {
+		position: relative;
+		height: 3.25rem;
+		border: 1px solid var(--border);
+	}
+
+	.planet-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		justify-content: center;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid rgba(43, 38, 34, 0.2);
+	}
+</style>

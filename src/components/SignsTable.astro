@@ -1,0 +1,520 @@
+---
+import { SIGN_ATTRIBUTES } from "../data/signs";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+import { dignitiesOf, elementStyle, makeSignsLabels } from "./signs-shared";
+import SignsAccordion from "./SignsAccordion.astro";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const st = t.signsTable;
+const { name, signName, dignityLabel, triplicityLabel } = makeLabels(lang);
+const { text, elementName } = makeSignsLabels(lang);
+
+// Each sign's PDF attributes paired with its dignities entry (ruler,
+// exaltation, triplicities, terms, faces come from dignities.ts).
+const ROWS = SIGN_ATTRIBUTES.map((a) => ({ a, d: dignitiesOf(a.sign) }));
+
+const COLS = ROWS.length + 1;
+---
+
+<div class="table-wrap">
+	<div class="sticky-sentinel" aria-hidden="true"></div>
+	<table class="signs">
+		<colgroup>
+			<col class="col-label" />
+			{ROWS.map(() => <col class="col-sign" />)}
+		</colgroup>
+		<thead>
+			<tr>
+				<th class="col-label">{st.sign}</th>
+				{
+					ROWS.map(({ d }) => (
+						<th
+							class="col-sign"
+							style={elementStyle(d.element)}
+							title={signName(d.sign)}
+						>
+							<span class="glyph">{d.symbol}</span>
+						</th>
+					))
+				}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{st.sectionNature}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{st.qualities}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.qualities)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.element}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>{elementName(d.element)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.temperament}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.temperament)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.gender}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.gender)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.sect}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.sect)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.mode}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.mode)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.season}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.season)}</td>
+					))
+				}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{st.sectionPlanets}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{st.ruler}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>
+							<div class="planet-chips">
+								<span
+									class="chip"
+									style={planetStyle(d.throne)}
+									title={name(d.throne)}
+								>
+									<span class="glyph">{symbol(d.throne)}</span>
+								</span>
+							</div>
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.exaltation}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>
+							{d.exaltation && (
+								<div class="planet-chips">
+									<span
+										class="chip"
+										style={planetStyle(d.exaltation.planet)}
+										title={dignityLabel(d.exaltation)}
+									>
+										<span class="glyph">{symbol(d.exaltation.planet)}</span>
+									</span>
+								</div>
+							)}
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.triplicities}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>
+							<div class="planet-chips">
+								<span
+									class="chip"
+									style={planetStyle(d.triplicity.day)}
+									title={triplicityLabel(d.triplicity.day, "day")}
+								>
+									<span class="glyph">{symbol(d.triplicity.day)}</span>
+								</span>
+								<span
+									class="chip"
+									style={planetStyle(d.triplicity.night)}
+									title={triplicityLabel(d.triplicity.night, "night")}
+								>
+									<span class="glyph">{symbol(d.triplicity.night)}</span>
+								</span>
+								<span
+									class="chip"
+									style={planetStyle(d.triplicity.participant)}
+									title={triplicityLabel(d.triplicity.participant, "participant")}
+								>
+									<span class="glyph">{symbol(d.triplicity.participant)}</span>
+								</span>
+							</div>
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.terms}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>
+							<div class="planet-chips">
+								{d.terms.map((e) => (
+									<span
+										class="chip"
+										style={planetStyle(e.planet)}
+										title={`${name(e.planet)} ${e.from}°–${e.to}°59′`}
+									>
+										<span class="glyph">{symbol(e.planet)}</span>
+									</span>
+								))}
+							</div>
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.faces}</th>
+				{
+					ROWS.map(({ d }) => (
+						<td style={elementStyle(d.element)}>
+							<div class="planet-chips">
+								{d.faces.map((e) => (
+									<span
+										class="chip"
+										style={planetStyle(e.planet)}
+										title={`${name(e.planet)} ${e.from}°–${e.to}°59′`}
+									>
+										<span class="glyph">{symbol(e.planet)}</span>
+									</span>
+								))}
+							</div>
+						</td>
+					))
+				}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{st.sectionAttributes}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{st.behavior}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td class="multiline" style={elementStyle(d.element)}>
+							{text(a.behavior)}
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.voice}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.voice)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.fertility}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.fertility)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.flavor}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.flavor)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.direction}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.direction)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.ascension}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.ascension)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.latitude}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.latitude)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.commandObey}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.commandObey)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{st.solarLunar}</th>
+				{
+					ROWS.map(({ a, d }) => (
+						<td style={elementStyle(d.element)}>{text(a.solarLunar)}</td>
+					))
+				}
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<SignsAccordion lang={lang} />
+
+<script>
+	// Toggle .stuck on the wrap while the sticky thead is pinned to the
+	// viewport top — fades in the gradient shadow under the header.
+	document.querySelectorAll<HTMLElement>(".table-wrap").forEach((wrap) => {
+		const sentinel = wrap.querySelector<HTMLElement>(".sticky-sentinel");
+		if (!sentinel) return;
+		new IntersectionObserver(([entry]) => {
+			wrap.classList.toggle("stuck", !entry.isIntersecting);
+		}).observe(sentinel);
+	});
+</script>
+
+<style>
+	.table-wrap {
+		overflow-x: auto;
+	}
+
+	/* Once the table fits without horizontal scrolling, drop the scroll
+	   container — an overflow-x: auto ancestor blocks the thead's
+	   page-relative vertical sticky even when nothing actually scrolls.
+	   (Below this width the header simply doesn't stick — no max-height /
+	   inner vertical scroller on this table.) */
+	@media (min-width: 1460px) {
+		.table-wrap {
+			overflow: visible;
+		}
+
+		/* Gradient shadow under the stuck header — same recipe as the planets
+		   table, hung off the sticky cells themselves so it travels with them.
+		   Faded in via .stuck (toggled by the sentinel IntersectionObserver
+		   below); scoped to this media query because below it the header
+		   never sticks. */
+		table.signs thead th::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 100%;
+			height: 8px;
+			background: linear-gradient(
+				to bottom,
+				rgba(43, 38, 34, 0.25),
+				transparent
+			);
+			opacity: 0;
+			transition: opacity 0.15s ease;
+			pointer-events: none;
+		}
+
+		.table-wrap.stuck thead th::after {
+			opacity: 1;
+		}
+	}
+
+	/* 0-height probe for the IntersectionObserver that toggles .stuck —
+	   1px tall so it has a box to observe, pulled back out of layout. */
+	.sticky-sentinel {
+		height: 1px;
+		margin-bottom: -1px;
+	}
+
+	@media (max-width: 767px) {
+		.table-wrap {
+			display: none;
+		}
+	}
+
+	/* Separate (non-collapsed) borders, each owned by exactly one cell, so
+	   the sticky header and label column carry their borders with them —
+	   same scheme as the planets table. */
+	table.signs {
+		--border: #a89c8c;
+		border-collapse: separate;
+		border-spacing: 0;
+		width: 100%;
+		font-size: 0.8rem;
+	}
+
+	/* 0.3rem horizontal padding keeps three 1.75rem chips per row in the
+	   6.5rem columns (triplicities, terms, faces). */
+	table.signs th,
+	table.signs td {
+		border-bottom: 1px solid var(--border);
+		border-left: 1px solid var(--border);
+		padding: 0.5rem 0.3rem;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	/* Each border is owned by one cell: the label column carries its right
+	   border (so the line sticks with it when horizontally scrolled), the
+	   cell next to it drops its left border to compensate, the last column
+	   closes the right edge, and the header row closes the top. */
+	table.signs .col-label + th,
+	table.signs .col-label + td {
+		border-left: none;
+	}
+
+	table.signs th.col-label {
+		border-right: 1px solid var(--border);
+	}
+
+	table.signs th:last-child,
+	table.signs td:last-child {
+		border-right: 1px solid var(--border);
+	}
+
+	table.signs thead th {
+		border-top: 1px solid var(--border);
+	}
+
+	/* 10rem + 12 × 6.5rem = 88rem, which (plus main's 3rem padding) is what
+	   sets the 1460px fit breakpoint above. */
+	col.col-label {
+		width: 10rem;
+	}
+
+	col.col-sign {
+		width: 6.5rem;
+	}
+
+	th.col-label {
+		text-align: left;
+		font-weight: 600;
+		background: #f0ebe2;
+	}
+
+	td.multiline {
+		white-space: pre-line;
+	}
+
+	thead th.col-label {
+		text-transform: uppercase;
+		font-size: 0.8rem;
+	}
+
+	th.col-label {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+	}
+
+	table.signs thead th {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+
+	/* Corner cell sticks on both axes, above the sign headers and the
+	   label column. */
+	table.signs thead th.col-label {
+		left: 0;
+		z-index: 3;
+	}
+
+	th.section-header {
+		background: #e9e2d6;
+		text-align: left;
+		text-transform: uppercase;
+		font-size: 0.8rem;
+		letter-spacing: 0.02em;
+		padding: 0.4rem 0.6rem;
+	}
+
+	/* Subtle zebra over the element tints — a translucent white overlay on
+	   even rows (background-image layers over the inline element color, which
+	   must stay opaque for the sticky header). */
+	tbody tr:nth-child(even) td {
+		background-image: linear-gradient(
+			rgba(255, 255, 255, 0.35),
+			rgba(255, 255, 255, 0.35)
+		);
+	}
+
+	table.signs [title] {
+		cursor: pointer;
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.5rem;
+		line-height: 1;
+		display: inline-block;
+	}
+
+	.planet-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		justify-content: center;
+	}
+
+	/* Unlike the planets table's chips (which sit on a neutral background),
+	   these sit on element-tinted cells — the hairline border keeps pastel
+	   chips visible on pastel cells (and gives node chips, which have no
+	   planet color, a visible box). */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid rgba(43, 38, 34, 0.2);
+		cursor: pointer;
+	}
+</style>

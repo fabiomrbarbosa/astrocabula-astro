@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SignsTable from "../../components/SignsTable.astro";
+import { ui } from "../../i18n";
+
+const lang = "en";
+const t = ui[lang];
+---
+
+<Layout title={t.signsPage.title} lang={lang}>
+	<h1 class="visually-hidden">{t.signsPage.title}</h1>
+
+	<SignsTable lang={lang} />
+</Layout>
