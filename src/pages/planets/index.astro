@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlanetsTable from "../../components/PlanetsTable.astro";
+import { ui } from "../../i18n";
+
+const lang = "en";
+const t = ui[lang];
+---
+
+<Layout title={t.planetsPage.title} lang={lang}>
+	<h1 class="visually-hidden">{t.planetsPage.title}</h1>
+
+	<PlanetsTable lang={lang} />
+</Layout>

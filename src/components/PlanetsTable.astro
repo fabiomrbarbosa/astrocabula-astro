@@ -1,0 +1,435 @@
+---
+import { PLANETS } from "../data/planets";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+import {
+	domicileSigns,
+	exaltationSign,
+	makePlanetsLabels,
+	toRoman,
+} from "./planets-shared";
+import PlanetsAccordion from "./PlanetsAccordion.astro";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const pt = t.planetsTable;
+const { name, signName } = makeLabels(lang);
+const { text, weekday, years } = makePlanetsLabels(lang);
+
+const COLS = PLANETS.length + 1;
+---
+
+<div class="table-wrap">
+	<div class="sticky-sentinel" aria-hidden="true"></div>
+	<table class="planets">
+		<colgroup>
+			<col class="col-label" />
+			{PLANETS.map(() => <col class="col-planet" />)}
+		</colgroup>
+		<thead>
+			<tr>
+				<th class="col-label">{pt.planet}</th>
+				{
+					PLANETS.map((p) => (
+						<th
+							class="col-planet"
+							style={planetStyle(p.planet)}
+							title={name(p.planet)}
+						>
+							<span class="glyph">{symbol(p.planet)}</span>
+						</th>
+					))
+				}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{pt.sectionNature}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{pt.qualities}</th>
+				{PLANETS.map((p) => <td>{text(p.qualities)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.temperament}</th>
+				{
+					PLANETS.map((p) => (
+						<td class="multiline">{text(p.temperament)}</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.gender}</th>
+				{PLANETS.map((p) => <td>{text(p.gender)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.sect}</th>
+				{PLANETS.map((p) => <td>{text(p.sect)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.beneficMalefic}</th>
+				{PLANETS.map((p) => <td>{text(p.benefic)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.halfOrb}</th>
+				{PLANETS.map((p) => <td>{p.halfOrb}°</td>)}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{pt.sectionAffinity}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{pt.friends}</th>
+				{
+					PLANETS.map((p) => (
+						<td>
+							<div class="planet-chips">
+								{p.friends.map((f) => (
+									<span class="chip" style={planetStyle(f)} title={name(f)}>
+										<span class="glyph">{symbol(f)}</span>
+									</span>
+								))}
+							</div>
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.enemies}</th>
+				{
+					PLANETS.map((p) => (
+						<td>
+							<div class="planet-chips">
+								{p.enemies.map((e) => (
+									<span class="chip" style={planetStyle(e)} title={name(e)}>
+										<span class="glyph">{symbol(e)}</span>
+									</span>
+								))}
+							</div>
+						</td>
+					))
+				}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{pt.sectionCycles}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{pt.avgSpeed}</th>
+				{PLANETS.map((p) => <td>{p.avgSpeed}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.zodiacalCycle}</th>
+				{PLANETS.map((p) => <td>{text(p.zodiacalCycle)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.firdaria}</th>
+				{PLANETS.map((p) => <td>{p.firdaria}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.agesOfMan}</th>
+				{PLANETS.map((p) => <td>{text(p.agesOfMan)}</td>)}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{pt.sectionYears}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{pt.yearsMinor}</th>
+				{PLANETS.map((p) => <td>{years(p.years.minor)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.yearsMiddle}</th>
+				{PLANETS.map((p) => <td>{years(p.years.middle)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.yearsMajor}</th>
+				{PLANETS.map((p) => <td>{years(p.years.major)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.yearsMax}</th>
+				{PLANETS.map((p) => <td>{years(p.years.max)}</td>)}
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th colspan={COLS} scope="colgroup" class="section-header"
+					>{pt.sectionRulerships}</th
+				>
+			</tr>
+			<tr>
+				<th class="col-label">{pt.houseOfJoy}</th>
+				{
+					PLANETS.map((p) => (
+						<td title={`${pt.houseOfJoy} ${toRoman(p.houseOfJoy)}`}>
+							{toRoman(p.houseOfJoy)}
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.dayRuler}</th>
+				{PLANETS.map((p) => <td>{weekday(p.dayRuler)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.nightRuler}</th>
+				{PLANETS.map((p) => <td>{weekday(p.nightRuler)}</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.domicile}</th>
+				{
+					PLANETS.map((p) => (
+						<td>
+							<div class="planet-chips">
+								{domicileSigns(p.planet).map((s) => (
+									<span
+										class="chip"
+										style={planetStyle(p.planet)}
+										title={signName(s.sign)}
+									>
+										<span class="glyph">{s.symbol}</span>
+									</span>
+								))}
+							</div>
+						</td>
+					))
+				}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.exaltation}</th>
+				{
+					PLANETS.map((p) => {
+						const sign = exaltationSign(p.planet);
+						return (
+							<td>
+								{sign && (
+									<div class="planet-chips">
+										<span
+											class="chip"
+											style={planetStyle(p.planet)}
+											title={signName(sign.sign)}
+										>
+											<span class="glyph">{sign.symbol}</span>
+										</span>
+									</div>
+								)}
+							</td>
+						);
+					})
+				}
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<PlanetsAccordion lang={lang} />
+
+<script>
+	// Toggle .stuck on the wrap while the sticky thead is pinned to the
+	// viewport top — fades in the gradient shadow under the header.
+	document.querySelectorAll<HTMLElement>(".table-wrap").forEach((wrap) => {
+		const sentinel = wrap.querySelector<HTMLElement>(".sticky-sentinel");
+		if (!sentinel) return;
+		new IntersectionObserver(([entry]) => {
+			wrap.classList.toggle("stuck", !entry.isIntersecting);
+		}).observe(sentinel);
+	});
+</script>
+
+<style>
+	.table-wrap {
+		overflow-x: auto;
+	}
+
+	/* Once the table fits without horizontal scrolling, drop the scroll
+	   container — an overflow-x: auto ancestor blocks the thead's
+	   page-relative vertical sticky even when nothing actually scrolls.
+	   (Below this width the header simply doesn't stick.) */
+	@media (min-width: 1120px) {
+		.table-wrap {
+			overflow: visible;
+		}
+
+		/* Gradient shadow under the stuck header — the dignities table's
+		   sticky-column shadow recipe rotated 90°, hung off the sticky cells
+		   themselves so it travels with them. Faded in via .stuck (toggled
+		   by the sentinel IntersectionObserver below); scoped to this media
+		   query because below it the header never sticks. */
+		table.planets thead th::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 100%;
+			height: 8px;
+			background: linear-gradient(
+				to bottom,
+				rgba(43, 38, 34, 0.25),
+				transparent
+			);
+			opacity: 0;
+			transition: opacity 0.15s ease;
+			pointer-events: none;
+		}
+
+		.table-wrap.stuck thead th::after {
+			opacity: 1;
+		}
+	}
+
+	/* 0-height probe for the IntersectionObserver that toggles .stuck —
+	   1px tall so it has a box to observe, pulled back out of layout. */
+	.sticky-sentinel {
+		height: 1px;
+		margin-bottom: -1px;
+	}
+
+	@media (max-width: 767px) {
+		.table-wrap {
+			display: none;
+		}
+	}
+
+	/* Unlike the dignities table, this one uses separate (non-collapsed)
+	   borders: collapsed borders don't travel with sticky cells (and Chrome
+	   and Firefox disagree on what's left behind), which the dignities table
+	   patches with scroll-gated box-shadows. With border-spacing: 0 and each
+	   border owned by exactly one cell, the sticky header and label column
+	   carry their borders with them — no repaint hacks needed. */
+	table.planets {
+		--border: #a89c8c;
+		border-collapse: separate;
+		border-spacing: 0;
+		width: 100%;
+		font-size: 0.85rem;
+	}
+
+	table.planets th,
+	table.planets td {
+		border-bottom: 1px solid var(--border);
+		border-left: 1px solid var(--border);
+		padding: 0.5rem 0.6rem;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	/* Each border is owned by one cell: the label column carries its right
+	   border (so the line sticks with it when horizontally scrolled), the
+	   cell next to it drops its left border to compensate, the last column
+	   closes the right edge, and the header row closes the top. */
+	table.planets .col-label + th,
+	table.planets .col-label + td {
+		border-left: none;
+	}
+
+	table.planets th.col-label {
+		border-right: 1px solid var(--border);
+	}
+
+	table.planets th:last-child,
+	table.planets td:last-child {
+		border-right: 1px solid var(--border);
+	}
+
+	table.planets thead th {
+		border-top: 1px solid var(--border);
+	}
+
+	col.col-label {
+		width: 11rem;
+	}
+
+	col.col-planet {
+		width: 8rem;
+	}
+
+	th.col-label {
+		text-align: left;
+		font-weight: 600;
+		background: #f0ebe2;
+	}
+
+	td.multiline {
+		white-space: pre-line;
+	}
+
+	thead th.col-label {
+		text-transform: uppercase;
+		font-size: 0.8rem;
+	}
+
+	thead th.col-planet {
+		font-weight: 600;
+	}
+
+	th.col-label {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+	}
+
+	table.planets thead th {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+
+	/* Corner cell sticks on both axes, above the planet headers and the
+	   label column. */
+	table.planets thead th.col-label {
+		left: 0;
+		z-index: 3;
+	}
+
+	th.section-header {
+		background: #e9e2d6;
+		text-align: left;
+		text-transform: uppercase;
+		font-size: 0.8rem;
+		letter-spacing: 0.02em;
+		padding: 0.4rem 0.6rem;
+	}
+
+	tbody tr:nth-child(even) td {
+		background: #f5f0e8;
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.5rem;
+		line-height: 1;
+		display: inline-block;
+	}
+
+	.planet-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		justify-content: center;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		cursor: pointer;
+	}
+</style>

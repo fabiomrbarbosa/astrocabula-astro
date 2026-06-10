@@ -1,0 +1,351 @@
+---
+import { PLANETS } from "../data/planets";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+import {
+	domicileSigns,
+	exaltationSign,
+	makePlanetsLabels,
+	toRoman,
+} from "./planets-shared";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const pt = t.planetsTable;
+const { name, signName } = makeLabels(lang);
+const { text, weekday, years } = makePlanetsLabels(lang);
+---
+
+<div class="planets-accordion">
+	{
+		PLANETS.map((p) => (
+			<details name="planets">
+				<summary>
+					<span class="glyph" style={planetStyle(p.planet)}>
+						{symbol(p.planet)}
+					</span>
+					<span class="planet-name">{name(p.planet)}</span>
+					<span class="chevron" aria-hidden="true">
+						<svg
+							viewBox="0 0 16 16"
+							width="10"
+							height="10"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M3 6 L8 11 L13 6" />
+						</svg>
+					</span>
+				</summary>
+				<div class="body">
+					<section>
+						<h3>{pt.sectionNature}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{pt.qualities}</span>
+								<span class="cell-value">{text(p.qualities)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.temperament}</span>
+								<span class="cell-value multiline">
+									{text(p.temperament)}
+								</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.gender}</span>
+								<span class="cell-value">{text(p.gender)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.sect}</span>
+								<span class="cell-value">{text(p.sect)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.beneficMalefic}</span>
+								<span class="cell-value">{text(p.benefic)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.halfOrb}</span>
+								<span class="cell-value">{p.halfOrb}°</span>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{pt.sectionAffinity}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{pt.friends}</span>
+								<div class="planet-chips">
+									{p.friends.map((f) => (
+										<span class="chip" style={planetStyle(f)} title={name(f)}>
+											<span class="glyph">{symbol(f)}</span>
+										</span>
+									))}
+								</div>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.enemies}</span>
+								<div class="planet-chips">
+									{p.enemies.map((e) => (
+										<span class="chip" style={planetStyle(e)} title={name(e)}>
+											<span class="glyph">{symbol(e)}</span>
+										</span>
+									))}
+								</div>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{pt.sectionCycles}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{pt.avgSpeed}</span>
+								<span class="cell-value">{p.avgSpeed}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.zodiacalCycle}</span>
+								<span class="cell-value">{text(p.zodiacalCycle)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.firdaria}</span>
+								<span class="cell-value">{p.firdaria}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.agesOfMan}</span>
+								<span class="cell-value">{text(p.agesOfMan)}</span>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{pt.sectionYears}</h3>
+						<div class="fields-grid four">
+							<div class="cell">
+								<span class="cell-label">{pt.yearsMinor}</span>
+								<span class="cell-value">{years(p.years.minor)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.yearsMiddle}</span>
+								<span class="cell-value">{years(p.years.middle)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.yearsMajor}</span>
+								<span class="cell-value">{years(p.years.major)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.yearsMax}</span>
+								<span class="cell-value">{years(p.years.max)}</span>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h3>{pt.sectionRulerships}</h3>
+						<div class="fields-grid">
+							<div class="cell">
+								<span class="cell-label">{pt.houseOfJoy}</span>
+								<span class="cell-value">{toRoman(p.houseOfJoy)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.dayRuler}</span>
+								<span class="cell-value">{weekday(p.dayRuler)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.nightRuler}</span>
+								<span class="cell-value">{weekday(p.nightRuler)}</span>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.domicile}</span>
+								<div class="planet-chips">
+									{domicileSigns(p.planet).map((s) => (
+										<span
+											class="chip"
+											style={planetStyle(p.planet)}
+											title={signName(s.sign)}
+										>
+											<span class="glyph">{s.symbol}</span>
+										</span>
+									))}
+								</div>
+							</div>
+							<div class="cell">
+								<span class="cell-label">{pt.exaltation}</span>
+								{(() => {
+									const sign = exaltationSign(p.planet);
+									return (
+										sign && (
+											<div class="planet-chips">
+												<span
+													class="chip"
+													style={planetStyle(p.planet)}
+													title={signName(sign.sign)}
+												>
+													<span class="glyph">{sign.symbol}</span>
+												</span>
+											</div>
+										)
+									);
+								})()}
+							</div>
+						</div>
+					</section>
+				</div>
+			</details>
+		))
+	}
+</div>
+
+<script>
+	import { setupAccordionAnimation } from "./accordion-animation";
+
+	setupAccordionAnimation(".planets-accordion");
+</script>
+
+<style>
+	/* Mobile counterpart of PlanetsTable — shown only below 768px (the
+	   table's .table-wrap carries the mirror-image rule). */
+	.planets-accordion {
+		--border: #a89c8c;
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.planets-accordion {
+			display: block;
+		}
+	}
+
+	details {
+		border: 1px solid var(--border);
+	}
+
+	details + details {
+		border-top: none;
+	}
+
+	summary {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.4rem 0.75rem;
+		background: #f0ebe2;
+		cursor: pointer;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	details[open] summary,
+	summary:focus-visible {
+		background: #f7f4ee;
+	}
+
+	.planets-accordion *,
+	.planets-accordion *:focus-visible {
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	summary .glyph {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		font-weight: normal;
+		font-size: 1.25rem;
+	}
+
+	.chevron {
+		display: inline-flex;
+		margin-left: auto;
+		color: var(--muted);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 1.2;
+		display: inline-block;
+	}
+
+	.body {
+		display: grid;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.75rem;
+	}
+
+	.body [title] {
+		cursor: pointer;
+	}
+
+	section h3 {
+		margin: 0 0 0.35rem;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	.fields-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+
+	.fields-grid.four {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.cell {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.4rem 0.25rem;
+		border: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.cell-label {
+		font-weight: 600;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+	}
+
+	.cell-value.multiline {
+		white-space: pre-line;
+	}
+
+	.planet-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		justify-content: center;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+	}
+</style>

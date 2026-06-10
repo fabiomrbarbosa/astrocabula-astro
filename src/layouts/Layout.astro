@@ -8,6 +8,14 @@ interface Props {
 
 const { title, lang = defaultLang } = Astro.props;
 const t = ui[lang];
+
+// Lang switcher targets: same page in the other language, not the homepage.
+// Astro.url.pathname may lack the trailing slash at build time — add it back
+// (trailingSlash: "always").
+const path = Astro.url.pathname.replace(/\/?$/, "/");
+const basePath = lang === "pt" ? path.replace(/^\/pt/, "") || "/" : path;
+const enHref = basePath;
+const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 ---
 
 <!doctype html>
@@ -61,9 +69,10 @@ const t = ui[lang];
 			</a>
 			<nav>
 				<a href={lang === "pt" ? "/pt/" : "/"}>{t.nav.dignities}</a>
+				<a href={lang === "pt" ? "/pt/planets/" : "/planets/"}>{t.nav.planets}</a>
 				<span class="lang-switcher">
 					<a
-						href="/"
+						href={enHref}
 						class={lang === "en" ? "active" : ""}
 						data-lang="en"
 						aria-current={lang === "en" ? "true" : undefined}
@@ -71,7 +80,7 @@ const t = ui[lang];
 						EN
 					</a>
 					<a
-						href="/pt/"
+						href={ptHref}
 						class={lang === "pt" ? "active" : ""}
 						data-lang="pt"
 						aria-current={lang === "pt" ? "true" : undefined}
@@ -201,11 +210,6 @@ const t = ui[lang];
 		line-height: 1.5;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-	}
-	h1 {
-		margin-bottom: 1em;
-		font-weight: normal;
-		letter-spacing: -0.02em;
 	}
 
 	.visually-hidden {
