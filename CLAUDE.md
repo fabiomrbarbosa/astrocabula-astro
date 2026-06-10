@@ -9,6 +9,9 @@ Currently has one page (Essential Dignities); more reference pages are planned.
 - Plain CSS in component `<style>` blocks / `Layout.astro` global styles — no
   Tailwind or CSS framework.
 - Dev: `npm run dev` (port 4321, Astro will bump to next free port if busy).
+- `astro.config.mjs`: `output: "static"` (also built/served via the
+  `Dockerfile`, nginx) and `trailingSlash: "always"` — internal links should
+  include the trailing slash (e.g. `/pt/`, not `/pt`).
 
 ## Structure
 
