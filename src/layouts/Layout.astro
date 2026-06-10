@@ -1,0 +1,203 @@
+---
+import { ui, defaultLang, HTML_LANG, type Lang } from '../i18n';
+
+interface Props {
+	title: string;
+	lang?: Lang;
+}
+
+const { title, lang = defaultLang } = Astro.props;
+const t = ui[lang];
+---
+
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} · {t.siteName}</title>
+		<script is:inline>
+			(function () {
+				var STORAGE_KEY = 'astrocabula-lang';
+				var path = window.location.pathname;
+				var isPt = path === '/pt' || path.indexOf('/pt/') === 0;
+				var stored = localStorage.getItem(STORAGE_KEY);
+				var target = null;
+
+				if (stored === 'pt' && !isPt) {
+					target = '/pt' + path;
+				} else if (stored === 'en' && isPt) {
+					target = path.replace(/^\/pt/, '') || '/';
+				} else if (!stored) {
+					var browserPt = (navigator.languages || [navigator.language]).some(
+						function (l) {
+							return l.toLowerCase().indexOf('pt') === 0;
+						}
+					);
+					if (browserPt && !isPt) {
+						localStorage.setItem(STORAGE_KEY, 'pt');
+						target = '/pt' + path;
+					} else if (!browserPt && isPt) {
+						localStorage.setItem(STORAGE_KEY, 'en');
+						target = path.replace(/^\/pt/, '') || '/';
+					} else {
+						localStorage.setItem(STORAGE_KEY, browserPt ? 'pt' : 'en');
+					}
+				}
+
+				if (target) {
+					window.location.replace(target);
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<header class="site-header">
+			<a class="brand" href={lang === 'pt' ? '/pt/' : '/'}>{t.siteName}</a>
+			<nav>
+				<a href={lang === 'pt' ? '/pt/' : '/'}>{t.nav.dignities}</a>
+				<span class="lang-switcher">
+					<a
+						href="/"
+						class={lang === 'en' ? 'active' : ''}
+						data-lang="en"
+						aria-current={lang === 'en' ? 'true' : undefined}
+					>
+						EN
+					</a>
+					<a
+						href="/pt/"
+						class={lang === 'pt' ? 'active' : ''}
+						data-lang="pt"
+						aria-current={lang === 'pt' ? 'true' : undefined}
+					>
+						PT
+					</a>
+				</span>
+			</nav>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer class="site-footer">
+			<p>{t.footer}</p>
+		</footer>
+		<script is:inline>
+			document.querySelectorAll('.lang-switcher a').forEach(function (a) {
+				a.addEventListener('click', function () {
+					localStorage.setItem('astrocabula-lang', a.dataset.lang || 'en');
+				});
+			});
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	@font-face {
+		font-family: 'Astronomicon';
+		src: url('/fonts/Astronomicon.ttf') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	:root {
+		color-scheme: light dark;
+		--bg: #faf8f4;
+		--fg: #2b2622;
+		--muted: #756d64;
+		--border: #c9bdac;
+		--accent: #6b4f9e;
+
+		--fire: #f6e1d8;
+		--earth: #e3ecd8;
+		--air: #fdf3d0;
+		--water: #d9eaf2;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+
+	body {
+		font-family: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+		background: var(--bg);
+		color: var(--fg);
+		line-height: 1.5;
+	}
+
+	.site-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 1.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.site-header .brand {
+		font-weight: bold;
+		font-size: 1.25rem;
+		color: var(--accent);
+		text-decoration: none;
+		letter-spacing: 0.02em;
+	}
+
+	.site-header nav a {
+		color: var(--fg);
+		text-decoration: none;
+		margin-left: 1.5rem;
+		font-size: 0.95rem;
+	}
+
+	.site-header nav a:hover {
+		text-decoration: underline;
+	}
+
+	.lang-switcher {
+		display: inline-flex;
+		margin-left: 1.5rem;
+		font-size: 0.85rem;
+		gap: 0.25rem;
+	}
+
+	.lang-switcher a {
+		margin-left: 0;
+		padding: 0.1rem 0.35rem;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		color: var(--muted);
+	}
+
+	.lang-switcher a:hover {
+		text-decoration: none;
+		color: var(--fg);
+	}
+
+	.lang-switcher a.active {
+		color: var(--accent);
+		border-color: var(--accent);
+		font-weight: bold;
+	}
+
+	main {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1.5rem;
+	}
+
+	.site-footer {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem 2.5rem;
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+</style>

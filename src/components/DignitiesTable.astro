@@ -1,0 +1,662 @@
+---
+import {
+	SIGNS,
+	PLANET_SYMBOLS,
+	type Planet,
+	type Dignity,
+} from "../data/dignities";
+import {
+	ui,
+	defaultLang,
+	type Lang,
+	PLANET_NAMES_I18N,
+	SIGN_NAMES_I18N,
+} from "../i18n";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+
+function symbol(planet: Planet) {
+	return PLANET_SYMBOLS[planet];
+}
+
+function name(planet: Planet) {
+	return PLANET_NAMES_I18N[lang][planet];
+}
+
+function signName(sign: string) {
+	return SIGN_NAMES_I18N[lang][sign];
+}
+
+function dignityLabel(d?: Dignity) {
+	if (!d) return "";
+	return d.degree !== undefined
+		? `${name(d.planet)} (${d.degree}°)`
+		: name(d.planet);
+}
+
+const DEGREE_TICKS = Array.from({ length: 30 }, (_, i) => i);
+const FIVE_DEGREE_TICKS = [5, 10, 15, 20, 25];
+const TEN_DEGREE_TICKS = [10, 20];
+
+// Background tint per planet, used for term segments and planet glyphs throughout the table.
+// Nodes are intentionally excluded — they're shown without a background tint.
+const PLANET_COLORS: Partial<Record<Planet, string>> = {
+	Sun: "#fbe7b6",
+	Moon: "#e8eef2",
+	Mercury: "#f5edc2",
+	Venus: "#dcead2",
+	Mars: "#f6d6d6",
+	Jupiter: "#d3ddf6",
+	Saturn: "#dadada",
+};
+
+function planetStyle(planet: Planet) {
+	const color = PLANET_COLORS[planet];
+	return color ? `background-color: ${color}` : undefined;
+}
+
+function planetsStyle(planets: Planet[]) {
+	if (planets.length === 1) return planetStyle(planets[0]);
+	// Two co-rulers: solid base color plus a diagonal triangle (see .segment.split::after)
+	// in the second planet's color, split along the bottom-left/top-right diagonal.
+	return `${planetStyle(planets[0])}; --split-color: ${PLANET_COLORS[planets[1]]}`;
+}
+
+function tickClass(degree: number, terms: { from: number }[]) {
+	if (degree > 0 && terms.some((t) => t.from === degree)) return "major";
+	if (degree % 5 === 0) return "medium";
+	return "minor";
+}
+---
+
+<div class="table-wrap">
+	<table class="dignities">
+		<colgroup>
+			<col class="col-sign" />
+			<col class="col-throne" />
+			<col class="col-exalt" />
+			<col class="col-triplicity" />
+			<col class="col-triplicity" />
+			<col class="col-triplicity" />
+			<col class="col-terms" />
+			<col class="col-faces" />
+			<col class="col-exile" />
+			<col class="col-fall" />
+			<col class="col-almuten" />
+			<col class="col-sign-end" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th rowspan="2" class="col-sign">{t.table.sign}</th>
+				<th rowspan="2" class="col-throne">{t.table.throne}</th>
+				<th rowspan="2" class="col-exalt">{t.table.exalt}</th>
+				<th colspan="3" class="col-triplicity">{t.table.triplicities}</th>
+				<th class="col-terms">{t.table.terms}</th>
+				<th class="col-faces">{t.table.faces}</th>
+				<th rowspan="2" class="col-exile">{t.table.exile}</th>
+				<th rowspan="2" class="col-fall">{t.table.fall}</th>
+				<th class="col-almuten">{t.table.almuten}</th>
+				<th rowspan="2" class="col-sign-end">{t.table.sign}</th>
+			</tr>
+			<tr>
+				<th class="col-triplicity sub">{t.table.day}</th>
+				<th class="col-triplicity sub">{t.table.night}</th>
+				<th class="col-triplicity sub">{t.table.participant}</th>
+				<th class="col-terms sub ruler-header">
+					<div class="ruler header-ruler">
+						<div class="ticks">
+							{
+								FIVE_DEGREE_TICKS.map((i) => (
+									<span
+										class="tick medium"
+										style={`left: ${(i / 30) * 100}%`}
+									/>
+								))
+							}
+						</div>
+						<div class="tick-labels">
+							{
+								FIVE_DEGREE_TICKS.map((i) => (
+									<span class="tick-label" style={`left: ${(i / 30) * 100}%`}>
+										{i}°
+									</span>
+								))
+							}
+						</div>
+					</div>
+				</th>
+				<th class="col-faces sub ruler-header">
+					<div class="ruler header-ruler">
+						<div class="ticks">
+							{
+								TEN_DEGREE_TICKS.map((i) => (
+									<span
+										class="tick medium"
+										style={`left: ${(i / 30) * 100}%`}
+									/>
+								))
+							}
+						</div>
+						<div class="tick-labels">
+							{
+								TEN_DEGREE_TICKS.map((i) => (
+									<span class="tick-label" style={`left: ${(i / 30) * 100}%`}>
+										{i}°
+									</span>
+								))
+							}
+						</div>
+					</div>
+				</th>
+				<th class="col-almuten sub ruler-header">
+					<div class="ruler header-ruler">
+						<div class="ticks">
+							{
+								FIVE_DEGREE_TICKS.map((i) => (
+									<span
+										class="tick medium"
+										style={`left: ${(i / 30) * 100}%`}
+									/>
+								))
+							}
+						</div>
+						<div class="tick-labels">
+							{
+								FIVE_DEGREE_TICKS.map((i) => (
+									<span class="tick-label" style={`left: ${(i / 30) * 100}%`}>
+										{i}°
+									</span>
+								))
+							}
+						</div>
+					</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				SIGNS.map((s) => (
+					<tr>
+						<td class="col-sign">
+							<span class="glyph" title={signName(s.sign)}>
+								{s.symbol}
+							</span>
+						</td>
+						<td class="col-throne" style={planetStyle(s.throne)}>
+							<span class="glyph" title={name(s.throne)}>
+								{symbol(s.throne)}
+							</span>
+						</td>
+						<td
+							class="col-exalt"
+							style={
+								s.exaltation ? planetStyle(s.exaltation.planet) : undefined
+							}
+						>
+							{s.exaltation ? (
+								<span title={dignityLabel(s.exaltation)}>
+									<span class="glyph">{symbol(s.exaltation.planet)}</span>
+									{s.exaltation.degree !== undefined && (
+										<sup>{s.exaltation.degree}°</sup>
+									)}
+								</span>
+							) : (
+								<span class="empty">—</span>
+							)}
+						</td>
+						<td
+							class="col-triplicity sub"
+							style={planetStyle(s.triplicity.day)}
+						>
+							<span class="glyph" title={name(s.triplicity.day)}>
+								{symbol(s.triplicity.day)}
+							</span>
+							<span class="tri-label">D</span>
+						</td>
+						<td
+							class="col-triplicity sub"
+							style={planetStyle(s.triplicity.night)}
+						>
+							<span class="glyph" title={name(s.triplicity.night)}>
+								{symbol(s.triplicity.night)}
+							</span>
+							<span class="tri-label">N</span>
+						</td>
+						<td
+							class="col-triplicity sub"
+							style={planetStyle(s.triplicity.participant)}
+						>
+							<span class="glyph" title={name(s.triplicity.participant)}>
+								{symbol(s.triplicity.participant)}
+							</span>
+							<span class="tri-label">P</span>
+						</td>
+						<td class="col-terms">
+							<div class="ruler term-ruler">
+								<div class="segments">
+									{s.terms.map((t) => (
+										<div
+											class="segment"
+											style={`left: ${(t.from / 30) * 100}%; width: ${((t.to - t.from + 1) / 30) * 100}%; background: ${PLANET_COLORS[t.planet]}`}
+											title={`${name(t.planet)} ${t.from}°–${t.to}°59′`}
+										>
+											<span class="glyph ruler-glyph">{symbol(t.planet)}</span>
+										</div>
+									))}
+								</div>
+								<div class="ticks">
+									{DEGREE_TICKS.filter((i) => i > 0).map((i) => (
+										<span
+											class={`tick ${tickClass(i, s.terms)}`}
+											style={`left: ${(i / 30) * 100}%`}
+										/>
+									))}
+								</div>
+								<div class="tick-labels">
+									{s.terms
+										.filter((t) => t.from > 0)
+										.map((t) => (
+											<span
+												class="tick-label"
+												style={`left: ${(t.from / 30) * 100}%`}
+											>
+												{String(t.from).padStart(2, "0")}°
+											</span>
+										))}
+								</div>
+							</div>
+						</td>
+						<td class="col-faces">
+							<div class="ruler face-ruler">
+								<div class="segments">
+									{s.faces.map((f) => (
+										<div
+											class="segment"
+											style={`left: ${(f.from / 30) * 100}%; width: ${((f.to - f.from + 1) / 30) * 100}%; background: ${PLANET_COLORS[f.planet]}`}
+											title={`${name(f.planet)} ${f.from}°–${f.to}°59′`}
+										>
+											<span class="glyph ruler-glyph">{symbol(f.planet)}</span>
+										</div>
+									))}
+								</div>
+								<div class="ticks">
+									{DEGREE_TICKS.filter((i) => i === 10 || i === 20).map((i) => (
+										<span
+											class="tick major"
+											style={`left: ${(i / 30) * 100}%`}
+										/>
+									))}
+								</div>
+							</div>
+						</td>
+						<td class="col-exile" style={planetStyle(s.exile)}>
+							<span class="glyph" title={name(s.exile)}>
+								{symbol(s.exile)}
+							</span>
+						</td>
+						<td
+							class="col-fall"
+							style={s.fall ? planetStyle(s.fall.planet) : undefined}
+						>
+							{s.fall ? (
+								<span title={dignityLabel(s.fall)}>
+									<span class="glyph">{symbol(s.fall.planet)}</span>
+									{s.fall.degree !== undefined && <sup>{s.fall.degree}°</sup>}
+								</span>
+							) : (
+								<span class="empty">—</span>
+							)}
+						</td>
+						<td class="col-almuten">
+							<div class="ruler almuten-ruler">
+								<div class="segments">
+									{s.almuten.map((a) => (
+										<div
+											class={`segment${a.planets.length > 1 ? " split" : ""}`}
+											style={`left: ${(a.from / 30) * 100}%; width: ${((a.to - a.from + 1) / 30) * 100}%; ${planetsStyle(a.planets)}`}
+											title={`${a.planets.map((p) => name(p)).join(" / ")} ${a.from}°–${a.to}°59′`}
+										>
+											<span class="planets">
+												{a.planets.map((p) => (
+													<span class="glyph ruler-glyph">{symbol(p)}</span>
+												))}
+											</span>
+										</div>
+									))}
+								</div>
+								<div class="ticks">
+									{DEGREE_TICKS.filter((i) => i > 0).map((i) => (
+										<span
+											class={`tick ${tickClass(i, s.almuten)}`}
+											style={`left: ${(i / 30) * 100}%`}
+										/>
+									))}
+								</div>
+								<div class="tick-labels">
+									{s.almuten
+										.filter((a) => a.from > 0)
+										.map((a) => (
+											<span
+												class="tick-label"
+												style={`left: ${(a.from / 30) * 100}%`}
+											>
+												{String(a.from).padStart(2, "0")}°
+											</span>
+										))}
+								</div>
+							</div>
+						</td>
+						<td class="col-sign-end">
+							<span class="glyph" title={signName(s.sign)}>
+								{s.symbol}
+							</span>
+						</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+</div>
+
+<style>
+	.table-wrap {
+		overflow-x: auto;
+	}
+
+	table.dignities {
+		--cell-min-width: 5rem;
+		--tick-spacing: 0.25rem;
+		table-layout: fixed;
+		border-collapse: collapse;
+		width: 100%;
+		min-width: 1100px;
+		font-size: 0.75rem;
+	}
+
+	table.dignities th,
+	table.dignities td {
+		border: 1px solid var(--border);
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	table.dignities th {
+		padding: 0.4rem 0.5rem;
+		overflow-wrap: break-word;
+	}
+
+	table.dignities td {
+		padding: 0;
+		min-width: var(--cell-min-width);
+	}
+
+	table.dignities thead th {
+		background: #f0ebe2;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	thead th.sub {
+		text-transform: none;
+		font-size: 0.75rem;
+	}
+
+	table.dignities th.ruler-header {
+		padding: 0;
+		position: relative;
+	}
+
+	.ruler.header-ruler {
+		position: absolute;
+		inset: 0;
+	}
+
+	.header-ruler .ticks {
+		position: absolute;
+		inset: 0;
+	}
+
+	.ruler.header-ruler .ticks .tick {
+		top: auto;
+		bottom: 0;
+	}
+
+	.header-ruler .tick-labels {
+		position: absolute;
+		inset: 0;
+		font-weight: 400;
+		text-transform: none;
+		letter-spacing: normal;
+		color: var(--fg);
+	}
+
+	.header-ruler .tick-labels .tick-label {
+		position: absolute;
+		top: var(--tick-spacing);
+		transform: translateX(-50%);
+		white-space: nowrap;
+	}
+
+	td.col-sign {
+		text-align: center;
+	}
+
+	th.col-sign,
+	td.col-sign {
+		position: sticky;
+		left: 0;
+		z-index: 2;
+		border-right: 1px solid var(--border);
+	}
+
+	td.col-sign {
+		background: var(--bg);
+	}
+
+	tbody tr:nth-child(even) td.col-sign {
+		background: #f5f0e8;
+	}
+
+	.table-wrap.scrolled {
+		border-left: 1px solid var(--border);
+	}
+
+	.table-wrap.scrolled th.col-sign,
+	.table-wrap.scrolled td.col-sign {
+		box-shadow: 4px 0 6px -4px rgba(43, 38, 34, 0.4);
+	}
+
+	td.col-sign-end {
+		text-align: center;
+	}
+
+	th.col-sign-end,
+	td.col-sign-end {
+		position: sticky;
+		/* -1px compensates for a sub-pixel rounding gap between the sticky
+		   column and the scroll container's edge under border-collapse. */
+		right: -1px;
+		z-index: 2;
+		border-left: 1px solid var(--border);
+	}
+
+	td.col-sign-end {
+		background: var(--bg);
+	}
+
+	tbody tr:nth-child(even) td.col-sign-end {
+		background: #f5f0e8;
+	}
+
+	.table-wrap.scrolled-end {
+		border-right: 1px solid var(--border);
+	}
+
+	.table-wrap.scrolled-end th.col-sign-end,
+	.table-wrap.scrolled-end td.col-sign-end {
+		box-shadow: -4px 0 6px -4px rgba(43, 38, 34, 0.4);
+	}
+
+	col.col-sign,
+	col.col-sign-end,
+	col.col-throne,
+	col.col-exalt,
+	col.col-triplicity,
+	col.col-exile,
+	col.col-fall {
+		width: var(--cell-min-width);
+	}
+
+	col.col-terms,
+	col.col-almuten {
+		width: 25rem;
+	}
+
+	col.col-faces {
+		width: calc(var(--cell-min-width) * 3);
+	}
+
+	td.col-terms,
+	td.col-faces,
+	td.col-almuten,
+	td.col-triplicity {
+		position: relative;
+	}
+
+	.tri-label {
+		position: absolute;
+		right: var(--tick-spacing);
+		bottom: var(--tick-spacing);
+		line-height: 1;
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 2.25;
+		display: inline-block;
+	}
+
+	.empty {
+		color: var(--muted);
+	}
+
+	td.col-exalt sup,
+	td.col-fall sup {
+		font-size: 1em;
+	}
+
+	.planets {
+		display: inline-flex;
+		gap: 0.2rem;
+	}
+
+	.ruler {
+		position: absolute;
+		inset: 0;
+	}
+
+	.ruler .segments {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.ruler .segment {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ruler .segment:last-child {
+		border-right: none;
+	}
+
+	.ruler .segment.split::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: var(--split-color);
+		clip-path: polygon(0 100%, 100% 100%, 100% 0%);
+	}
+
+	.ruler .ruler-glyph {
+		position: relative;
+		z-index: 1;
+		line-height: 1;
+	}
+
+	.ruler .ticks {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+
+	.ruler .ticks .tick {
+		position: absolute;
+		top: 0;
+		width: 1px;
+		background: rgba(43, 38, 34, 0.3);
+	}
+
+	.ruler .ticks .tick.minor {
+		height: var(--tick-spacing);
+	}
+
+	.ruler .ticks .tick.medium {
+		height: 0.5rem;
+	}
+
+	.ruler .ticks .tick.major {
+		height: 100%;
+	}
+
+	.term-ruler .tick-labels,
+	.almuten-ruler .tick-labels {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: var(--tick-spacing);
+		height: 0.75rem;
+		line-height: 1;
+		color: var(--fg);
+	}
+
+	.term-ruler .tick-labels .tick-label,
+	.almuten-ruler .tick-labels .tick-label {
+		position: absolute;
+		transform: translateX(var(--tick-spacing));
+		white-space: nowrap;
+	}
+
+	tbody tr:nth-child(even) {
+		background: #f5f0e8;
+	}
+</style>
+
+<script>
+	function setupStickySignShadow(wrap: HTMLElement) {
+		const update = () => {
+			wrap.classList.toggle("scrolled", wrap.scrollLeft > 0);
+			const maxScroll = wrap.scrollWidth - wrap.clientWidth;
+			wrap.classList.toggle("scrolled-end", wrap.scrollLeft < maxScroll - 1);
+		};
+		wrap.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+
+	document
+		.querySelectorAll<HTMLElement>(".table-wrap")
+		.forEach(setupStickySignShadow);
+</script>

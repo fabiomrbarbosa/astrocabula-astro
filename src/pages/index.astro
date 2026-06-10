@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DignitiesTable from '../components/DignitiesTable.astro';
+import { ui } from '../i18n';
+
+const lang = 'en';
+const t = ui[lang];
+---
+
+<Layout title={t.page.title} lang={lang}>
+	<h1>{t.page.title}</h1>
+	<p>{t.page.intro}</p>
+
+	<DignitiesTable lang={lang} />
+
+	<section class="legend">
+		<h2>{t.legend.title}</h2>
+		<ul>
+			<li>{t.legend.domicile}: <strong>+5</strong></li>
+			<li>{t.legend.exaltation}: <strong>+4</strong></li>
+			<li>{t.legend.triplicity}: <strong>+3</strong></li>
+			<li>{t.legend.term}: <strong>+2</strong></li>
+			<li>{t.legend.face}: <strong>+1</strong></li>
+			<li>{t.legend.exile}: <strong>−5</strong></li>
+			<li>{t.legend.fall}: <strong>−4</strong></li>
+		</ul>
+	</section>
+</Layout>
+
+<style>
+	h1 {
+		margin-bottom: 0.25rem;
+	}
+
+	p {
+		max-width: 70ch;
+		color: var(--muted);
+	}
+
+	.legend {
+		margin-top: 2rem;
+	}
+
+	.legend ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		list-style: none;
+		padding: 0;
+	}
+</style>
