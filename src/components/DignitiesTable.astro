@@ -510,6 +510,22 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 	.score-row {
 		text-transform: uppercase;
 	}
+
+	/* Opacity animation when hovering */
+
+	table.dignities tbody td:not(.col-sign):not(.col-sign-end) {
+		transition: opacity 0.15s ease;
+	}
+
+	table.dignities:has(tbody tr:hover)
+		tbody
+		td:not(.col-sign):not(.col-sign-end) {
+		opacity: 0.25;
+	}
+
+	table.dignities tbody tr:hover td:not(.col-sign):not(.col-sign-end) {
+		opacity: 1;
+	}
 </style>
 
 <script>
