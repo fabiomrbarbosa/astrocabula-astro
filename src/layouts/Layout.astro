@@ -50,6 +50,10 @@ const currentNavItem = navItems.find((item) => item.current);
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} · {t.siteName}</title>
+		<script
+			defer
+			data-domain="ref.astrofabio.com"
+			src="https://plausible.demiurgos.eu/js/script.js"></script>
 		<script>
 			// PWA: dist/sw.js is generated post-build (scripts/generate-sw.mjs)
 			// and precaches the whole site for offline use. It doesn't exist
