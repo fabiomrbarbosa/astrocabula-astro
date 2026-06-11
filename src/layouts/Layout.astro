@@ -80,7 +80,9 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 			</a>
 			<nav>
 				<a href={lang === "pt" ? "/pt/" : "/"}>{t.nav.dignities}</a>
-				<a href={lang === "pt" ? "/pt/planets/" : "/planets/"}>{t.nav.planets}</a>
+				<a href={lang === "pt" ? "/pt/planets/" : "/planets/"}
+					>{t.nav.planets}</a
+				>
 				<a href={lang === "pt" ? "/pt/signs/" : "/signs/"}>{t.nav.signs}</a>
 				<span class="lang-switcher">
 					<a
@@ -257,7 +259,7 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: 0.5rem;
+		gap: 1rem;
 	}
 
 	.site-header nav a {
@@ -324,7 +326,8 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 
 		.site-header nav {
 			flex-grow: 1;
-			justify-content: space-between;
+			justify-content: end;
+			gap: 0.5rem;
 		}
 
 		.brand-full {

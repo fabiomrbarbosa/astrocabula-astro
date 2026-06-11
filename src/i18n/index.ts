@@ -16,8 +16,8 @@ export const ui = {
 		siteNameShort: "Cheatsheet",
 		nav: {
 			dignities: "Essential Dignities",
-			planets: "Planetary Attributes",
-			signs: "Sign Attributes",
+			planets: "Planets",
+			signs: "Signs",
 		},
 		page: {
 			title: "Essential Dignities",
@@ -100,7 +100,7 @@ export const ui = {
 			commandObey: "Command/Obedience",
 			solarLunar: "Solar/Lunar",
 			sectionNature: "Nature",
-			sectionPlanets: "Planets",
+			sectionDignities: "Dignities",
 			sectionAttributes: "Attributes",
 		},
 		weekdays: [
@@ -120,9 +120,9 @@ export const ui = {
 		siteName: "Cábula Astrológica",
 		siteNameShort: "Cábula",
 		nav: {
-			dignities: "Dignidades Essenciais",
-			planets: "Atributos dos Planetas",
-			signs: "Atributos dos Signos",
+			dignities: "Dignidades",
+			planets: "Planetas",
+			signs: "Signos",
 		},
 		page: {
 			title: "Dignidades Essenciais",
@@ -205,7 +205,7 @@ export const ui = {
 			commandObey: "Comando/Obediência",
 			solarLunar: "Solar/Lunar",
 			sectionNature: "Natureza",
-			sectionPlanets: "Planetas",
+			sectionDignities: "Dignidades",
 			sectionAttributes: "Atributos",
 		},
 		weekdays: [

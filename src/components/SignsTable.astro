@@ -52,65 +52,37 @@ const COLS = ROWS.length + 1;
 			</tr>
 			<tr>
 				<th class="col-label">{st.qualities}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.qualities)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.qualities)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.element}</th>
-				{
-					ROWS.map(({ d }) => (
-						<td>{elementName(d.element)}</td>
-					))
-				}
+				{ROWS.map(({ d }) => <td>{elementName(d.element)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.temperament}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.temperament)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.temperament)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.gender}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.gender)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.gender)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.sect}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.sect)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.sect)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.mode}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.mode)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.mode)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.season}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.season)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.season)}</td>)}
 			</tr>
 		</tbody>
 		<tbody>
 			<tr>
 				<th colspan={COLS} scope="colgroup" class="section-header"
-					>{st.sectionPlanets}</th
+					>{st.sectionDignities}</th
 				>
 			</tr>
 			<tr>
@@ -174,7 +146,10 @@ const COLS = ROWS.length + 1;
 								<span
 									class="chip"
 									style={planetStyle(d.triplicity.participant)}
-									title={triplicityLabel(d.triplicity.participant, "participant")}
+									title={triplicityLabel(
+										d.triplicity.participant,
+										"participant",
+									)}
 								>
 									<span class="glyph">{symbol(d.triplicity.participant)}</span>
 								</span>
@@ -234,75 +209,39 @@ const COLS = ROWS.length + 1;
 			</tr>
 			<tr>
 				<th class="col-label">{st.behavior}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td class="multiline">{text(a.behavior)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td class="multiline">{text(a.behavior)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.voice}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.voice)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.voice)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.fertility}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.fertility)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.fertility)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.flavor}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.flavor)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.flavor)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.direction}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.direction)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.direction)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.ascension}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.ascension)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.ascension)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.latitude}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.latitude)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.latitude)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.commandObey}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.commandObey)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.commandObey)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{st.solarLunar}</th>
-				{
-					ROWS.map(({ a }) => (
-						<td>{text(a.solarLunar)}</td>
-					))
-				}
+				{ROWS.map(({ a }) => <td>{text(a.solarLunar)}</td>)}
 			</tr>
 		</tbody>
 	</table>
@@ -358,14 +297,8 @@ const COLS = ROWS.length + 1;
 		left: 0;
 		height: 8px;
 		margin-bottom: -8px;
-		transform: translateY(
-			calc(var(--stick-y, 0px) + var(--thead-h, 0px))
-		);
-		background: linear-gradient(
-			to bottom,
-			rgba(43, 38, 34, 0.25),
-			transparent
-		);
+		transform: translateY(calc(var(--stick-y, 0px) + var(--thead-h, 0px)));
+		background: linear-gradient(to bottom, rgba(43, 38, 34, 0.25), transparent);
 		opacity: 0;
 		transition: opacity 0.15s ease;
 		pointer-events: none;
