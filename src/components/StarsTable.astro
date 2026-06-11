@@ -110,6 +110,11 @@ const searchText = (s: Star) =>
 	</table>
 </div>
 
+<div class="legend">
+	<h2 class="legend-title">{t.starsTable.legendTitle}</h2>
+	<p class="legend-text">{t.starsTable.legendText}</p>
+</div>
+
 <p class="no-results" hidden>{st.noResults}</p>
 
 <script>
@@ -365,6 +370,19 @@ const searchText = (s: Star) =>
 
 	.chip .glyph {
 		font-size: 1.5rem;
+	}
+
+	.legend-title {
+		text-transform: uppercase;
+		font-size: 0.8rem;
+		letter-spacing: 0.02em;
+		font-weight: 600;
+		margin-bottom: 0;
+	}
+
+	.legend-text {
+		font-size: 0.8rem;
+		margin: 0;
 	}
 
 	.no-results {

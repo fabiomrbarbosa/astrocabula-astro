@@ -121,6 +121,9 @@ export const ui = {
 				E: "Star cluster",
 				G: "Galaxy",
 			},
+			legendTitle: "Legend",
+			legendText:
+				"N – Nebula; E – Star cluster; G – Galaxy (M31, Andromeda Galaxy)",
 		},
 		weekdays: [
 			"Sunday",
@@ -245,6 +248,9 @@ export const ui = {
 				E: "Enxame de estrelas",
 				G: "Galáxia",
 			},
+			legendTitle: "Legenda",
+			legendText:
+				"N – Nebulosa; E – Enxame de estrelas; G – Galáxia (M31, galáxia de Andrómeda)",
 		},
 		weekdays: [
 			"Domingo",
