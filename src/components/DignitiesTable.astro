@@ -279,8 +279,10 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 	}
 
 	.sticky-shadow-end {
-		right: calc(var(--cell-min-width) - 1px);
-		justify-self: end;
+		/* `left` (not `right`) — Chrome doesn't recompute a sticky grid
+		   item's `right` offset on scroll (it stays pinned to the
+		   first-paint position), unlike Firefox. The script below sets
+		   `left` on every scroll/resize instead. */
 		background: linear-gradient(to left, rgba(43, 38, 34, 0.25), transparent);
 	}
 
@@ -530,10 +532,22 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 
 <script>
 	function setupStickySignShadow(wrap: HTMLElement) {
+		const shadowEnd = wrap.querySelector<HTMLElement>(".sticky-shadow-end");
+		const endCol = wrap.querySelector<HTMLElement>(
+			"td.col-sign-end, th.col-sign-end",
+		);
 		const update = () => {
 			wrap.classList.toggle("scrolled", wrap.scrollLeft > 0);
 			const maxScroll = wrap.scrollWidth - wrap.clientWidth;
 			wrap.classList.toggle("scrolled-end", wrap.scrollLeft < maxScroll - 1);
+			if (shadowEnd && endCol) {
+				// Sticky `left` is an offset from the scrollport's left edge,
+				// not an absolute position — it must NOT include scrollLeft
+				// (that would push the element further right with every
+				// scroll step until it un-sticks off the visible area).
+				const left = wrap.clientWidth - endCol.offsetWidth - shadowEnd.offsetWidth + 1;
+				shadowEnd.style.left = `${left}px`;
+			}
 		};
 		wrap.addEventListener("scroll", update, { passive: true });
 		// Re-check on resize: if the page loads at mobile width the wrap is
