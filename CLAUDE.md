@@ -295,7 +295,7 @@ the dignities pair).
   anymore.
 - **Neutrals.** All neutral colors live in `Layout.astro` `:root` as a
   non-semantic light→dark ramp (`--neutral-0` `#faf8f4` … `--neutral-9`
-  `#2b2622`, plus `--ink-rgb: 43, 38, 34` for `rgba()` alpha tints — ruler
+  `#2b2422`, plus `--ink-rgb: 43, 36, 34` for `rgba()` alpha tints — ruler
   ticks, scroll-shadow gradients, chip hairlines). Components only ever use
   the semantic aliases assigned from the ramp: `--bg`, `--fg`, `--muted`,
   `--border`, `--border-strong`, `--accent`, `--surface-active`,
@@ -378,7 +378,7 @@ inset: 0 }`, so the **host must be a positioned box with real rendered
   rounding).
 - Tick heights: `.tick.minor` = `0.25rem` (every degree), `.tick.medium` =
   `0.5rem` (every 5°), `.tick.major` = `100%` (segment-opening ticks, via
-  `tickClass()`). All ticks share one color (`rgba(43, 38, 34, 0.3)`) —
+  `tickClass()`). All ticks share one color (`rgba(var(--ink-rgb), 0.3)`) —
   majors aren't darker. The 0° tick is always skipped
   (`DEGREE_TICKS.filter((i) => i > 0)`).
 - Table usage: Terms and Almuten get `fullTicks labels`; Faces gets neither —
