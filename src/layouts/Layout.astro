@@ -23,9 +23,20 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="theme-color" content="#faf8f4" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} · {t.siteName}</title>
+		<script>
+			// PWA: dist/sw.js is generated post-build (scripts/generate-sw.mjs)
+			// and precaches the whole site for offline use. It doesn't exist
+			// under `astro dev`, hence production-only.
+			if (import.meta.env.PROD && "serviceWorker" in navigator) {
+				navigator.serviceWorker.register("/sw.js");
+			}
+		</script>
 		<script is:inline>
 			(function () {
 				var STORAGE_KEY = "astrocabula-lang";
@@ -179,11 +190,6 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 		--muted: #756d64;
 		--border: #c9bdac;
 		--accent: #5c5347;
-
-		--fire: #f6e1d8;
-		--earth: #e3ecd8;
-		--air: #fdf3d0;
-		--water: #d9eaf2;
 	}
 
 	* {

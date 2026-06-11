@@ -1,0 +1,13 @@
+# Keep the Docker build context clean: deps and build output are produced
+# inside the image, and macOS junk must not end up in the served site.
+node_modules
+dist
+.git
+.astro
+.idea
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes

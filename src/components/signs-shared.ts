@@ -3,9 +3,7 @@ import type { BilingualText } from "../data/planets";
 import { ELEMENT_NAMES_I18N, type Lang } from "../i18n";
 
 // Background tint per element, sampled from the source PDF's column colors
-// (fire pink, earth green, air yellow, water periwinkle). Distinct from the
-// :root --fire/--earth/--air/--water variables, which are no longer used for
-// row tinting anywhere.
+// (fire pink, earth green, air yellow, water periwinkle).
 export const ELEMENT_COLORS: Record<Element, string> = {
 	Fire: "#F4CFCB",
 	Earth: "#D2E8D0",

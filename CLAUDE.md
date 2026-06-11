@@ -13,6 +13,13 @@ Attributes (`/signs/`) — each with a Portuguese variant under `/pt/`.
 - `astro.config.mjs`: `output: "static"` (also built/served via the
   `Dockerfile`, nginx) and `trailingSlash: "always"` — internal links should
   include the trailing slash (e.g. `/pt/`, not `/pt`).
+- `npm run build` = `astro build` + `node scripts/generate-sw.mjs` (see "PWA /
+  offline" below).
+- `.dockerignore` keeps `node_modules`, `dist`, `.git`, and macOS junk
+  (`.DS_Store` etc.) out of the Docker build context; `.gitignore` covers the
+  same macOS patterns. The SW generator also excludes `.DS_Store` — three
+  layers, because Finder recreates these files in `public/` and Astro copies
+  `public/` verbatim into `dist/`.
 
 ## Structure
 
@@ -325,6 +332,40 @@ inset: 0 }`, so the **host must be a positioned box with real rendered
   in the table's header ruler).
 - Accordion usage: Terms, Almuten, **and Faces** all get `fullTicks labels`
   (there's no header ruler on mobile, so Faces shows its own 10°/20° labels).
+
+## PWA / offline
+
+The whole site precaches on first visit (it's ~1.5 MB) and works fully
+offline / installs to the home screen. Hand-rolled, no Workbox —
+`@vite-pwa/astro` doesn't support Astro 6 (peer dep caps at 5); don't
+force-install it.
+
+- `scripts/generate-sw.mjs` runs after `astro build` (wired into the npm
+  `build` script, which the `Dockerfile` uses too): walks `dist/`,
+  content-hashes every file into the cache name (`astrocabula-<hash>`), and
+  writes `dist/sw.js` with the precache list. HTML is cached under pretty
+  URLs (`/pt/planets/`, not `pt/planets/index.html`) so navigations match
+  cache keys. Excluded: unused `fonts/Reforma1969|2018`, `.DS_Store`, and
+  `sw.js` itself.
+- The SW is cache-first for same-origin GETs — safe because any deploy
+  changes the hash → byte-different `sw.js` → browser reinstalls and the
+  `activate` handler swaps the whole cache atomically. Offline navigations
+  to uncached URLs fall back to `/`. With stock nginx headers, browsers
+  re-check `sw.js` within 24h, so deployed updates can take up to a day to
+  reach installed clients.
+- Registration lives in `Layout.astro`'s head, gated on
+  `import.meta.env.PROD` (`sw.js` doesn't exist under `astro dev`). The head
+  also links `manifest.webmanifest`, `apple-touch-icon`, and a `theme-color`
+  meta (`#faf8f4`).
+- Icons: `public/icons/icon.svg` is the master — an astrological Sun glyph
+  (pure SVG shapes, no font dependency) on the paper tone, kept inside the
+  central 80% so the same art serves `purpose: maskable`. PNGs (192/512 +
+  `apple-touch-icon.png` 180) are rendered from it via
+  `qlmanage -t -s 1024 -o /tmp icon.svg` then `sips -z <size> <size>` (no
+  rsvg/imagemagick on this machine). `favicon.svg` is the same glyph,
+  transparent, with a `prefers-color-scheme: dark` color swap.
+  `favicon.ico` is still the stock Astro one (no `.ico`-writing tool
+  available; modern browsers use the SVG).
 
 ## Verifying changes
 
