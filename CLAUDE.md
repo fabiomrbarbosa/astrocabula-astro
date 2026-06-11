@@ -1,7 +1,8 @@
 # Astrocabula
 
 A static multi-page site of traditional astrology cheatsheets, built with Astro.js.
-Currently has one page (Essential Dignities); more reference pages are planned.
+Pages: Essential Dignities (`/`), Planetary Attributes (`/planets/`), Sign
+Attributes (`/signs/`) — each with a Portuguese variant under `/pt/`.
 
 ## Stack
 
@@ -43,6 +44,23 @@ triplicityLabel }` (avoids threading `lang` through every call).
 - `src/pages/index.astro` (and `src/pages/pt/index.astro`) — homepage, uses
   `Layout` + `DignitiesTable`. No intro paragraph or separate scoring legend —
   the score row in the table covers that.
+- `src/i18n/index.ts` — all UI strings (`ui.en` / `ui.pt`): nav/page titles,
+  per-table label maps (`table`, `planetsTable`, `signsTable`), weekdays,
+  footer.
+- `src/components/PlanetsTable.astro` + `PlanetsAccordion.astro`,
+  `planets-shared.ts`, `src/data/planets.ts` — Planetary Attributes page
+  (`src/pages/planets/`, `pt/planets/`): one column per planet, attribute
+  rows grouped under full-width `th.section-header` rows (Nature, Affinity,
+  Cycles, Planetary Years, Rulerships). See "Attribute tables" below.
+- `src/components/SignsTable.astro` + `SignsAccordion.astro`,
+  `signs-shared.ts`, `src/data/signs.ts` — Sign Attributes page
+  (`src/pages/signs/`, `pt/signs/`): one column per sign; ruler/exaltation/
+  triplicities/terms/faces rows pull from `dignities.ts` via `dignitiesOf()`,
+  the PDF-only attributes from `signs.ts`. `ELEMENT_COLORS`/`elementStyle()`
+  (fire pink, earth green, air yellow, water periwinkle) live in
+  `signs-shared.ts`.
+- `src/components/accordion-animation.ts` — shared open/close animation used
+  by all three accordions.
 
 ## Data sources
 
@@ -54,8 +72,8 @@ repo):
   dignities table).
 - A companion text reference (`essential_dignities_reference.txt`, not in repo)
   with per-sign breakdowns, scoring rules, planetary/sign attributes, fixed
-  stars, and orb tables — only the essential-dignities portion has been used so
-  far. The rest (planetary attributes, sign attributes, fixed stars, orbs) is
+  stars, and orb tables — the essential-dignities, planetary-attributes and
+  sign-attributes portions have been used. The rest (fixed stars, orbs) is
   unused but available for future cheatsheet pages.
 - Attribution is rendered in the site footer (`Layout.astro`).
 
@@ -160,6 +178,51 @@ styles; both stay in the DOM — static site). It renders inside
   `-webkit-tap-highlight-color: transparent` — no browser focus/tap outline
   anywhere in the accordion (summary, cells, ruler segments, etc.); the
   lighter background above is the only focus/open indicator.
+
+## Attribute tables (Planets & Signs)
+
+`PlanetsTable.astro` and `SignsTable.astro` share one layout recipe (distinct
+from the dignities table): a non-sticky `th.col-label` row-label column, one
+column per planet/sign, full-width `th.section-header` group rows, and a
+mobile accordion rendered after `.table-wrap` (same <768px CSS-only swap as
+the dignities pair).
+
+- **Emulated sticky header.** The `thead` must stick to the viewport while
+  the wrap scrolls horizontally — impossible with real `position: sticky`,
+  because an `overflow-x: auto` ancestor blocks page-relative vertical
+  sticky at any width. Instead, a window scroll/resize listener (in each
+  table's `<script>`) sets `--stick-y` (clamped so the header parks at the
+  table's bottom edge) and `--thead-h` (measured) on `.table-wrap`, and
+  `thead th { transform: translateY(var(--stick-y)) }` does the pinning.
+  Only the header row sticks — the label column scrolls horizontally with
+  the table (intentional; don't make it sticky).
+- **Header shadow.** One full-width gradient strip per table — a single
+  `.table-wrap::before` (not per-cell `::after`s): zero net height (8px tall,
+  −8px margin), `transform: translateY(calc(var(--stick-y) + var(--thead-h)))`
+  to sit just under the header, and `position: sticky; left: 0` so it pins
+  to the visible left edge during horizontal scrolling (as an in-flow block
+  its width is the wrap's visible width, not the table's). Faded in via
+  `.stuck` (toggled by the same listener when `--stick-y > 0`).
+- `.table-wrap` is `overflow-x: auto; overflow-y: hidden` — the vertical
+  clip stops the shadow strip's last 8px from growing a vertical scrollbar
+  at the table's bottom edge. (Per the no-max-height rule, the page does all
+  vertical scrolling.)
+- **Separate borders.** `border-collapse: separate; border-spacing: 0`, each
+  border owned by exactly one cell (label column keeps its right border, the
+  next cell drops its left; last column closes the right edge; header row
+  closes the top) — collapsed borders don't travel with sticky/transformed
+  cells.
+- **Column stripes, not row zebra.** `tbody td:nth-child(even)` gets a
+  neutral `#f5f0e8` against the `#faf8f4` page background. Body cells carry
+  no planet/element tint — color coding lives only in the `thead` (planet
+  pastels on the planets table, `ELEMENT_COLORS` on the signs table).
+- **Chips.** Planets inside body cells render as small `planetStyle()`-tinted
+  `.chip` squares with glyph + `title` tooltip. Signs-table chips add a
+  hairline border (node chips have no planet color and need a visible box).
+  `.chip.with-label` (auto width) is used on the signs table for Terms
+  (start degree after the glyph, e.g. "♀ 0°") and Faces (localized ordinal
+  before the glyph — `signsTable.faceOrdinals`: "1st/2nd/3rd",
+  "1.º/2.º/3.º") — desktop table only, not the accordion.
 
 ## UI conventions
 
@@ -278,7 +341,5 @@ then a small script with `chromium.launch()` → `page.goto('http://localhost:PO
 
 ## Next steps (not started)
 
-- Additional cheatsheet pages (planetary attributes, sign attributes, fixed
-  stars, orbs) using the unused reference data described above.
-- Shared nav in `Layout.astro` currently only links to "/" — extend as new
-  pages are added.
+- Additional cheatsheet pages (fixed stars, orbs) using the unused reference
+  data described above; add their links to the shared nav in `Layout.astro`.

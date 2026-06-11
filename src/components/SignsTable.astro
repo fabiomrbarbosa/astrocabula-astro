@@ -23,7 +23,6 @@ const COLS = ROWS.length + 1;
 ---
 
 <div class="table-wrap">
-	<div class="sticky-sentinel" aria-hidden="true"></div>
 	<table class="signs">
 		<colgroup>
 			<col class="col-label" />
@@ -54,8 +53,8 @@ const COLS = ROWS.length + 1;
 			<tr>
 				<th class="col-label">{st.qualities}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.qualities)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.qualities)}</td>
 					))
 				}
 			</tr>
@@ -63,47 +62,47 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.element}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>{elementName(d.element)}</td>
+						<td>{elementName(d.element)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.temperament}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.temperament)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.temperament)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.gender}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.gender)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.gender)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.sect}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.sect)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.sect)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.mode}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.mode)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.mode)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.season}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.season)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.season)}</td>
 					))
 				}
 			</tr>
@@ -118,7 +117,7 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.ruler}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>
+						<td>
 							<div class="planet-chips">
 								<span
 									class="chip"
@@ -136,7 +135,7 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.exaltation}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>
+						<td>
 							{d.exaltation && (
 								<div class="planet-chips">
 									<span
@@ -156,7 +155,7 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.triplicities}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>
+						<td>
 							<div class="planet-chips">
 								<span
 									class="chip"
@@ -188,15 +187,16 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.terms}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>
+						<td>
 							<div class="planet-chips">
 								{d.terms.map((e) => (
 									<span
-										class="chip"
+										class="chip with-label"
 										style={planetStyle(e.planet)}
 										title={`${name(e.planet)} ${e.from}°–${e.to}°59′`}
 									>
 										<span class="glyph">{symbol(e.planet)}</span>
+										<span class="chip-label">{e.from}°</span>
 									</span>
 								))}
 							</div>
@@ -208,14 +208,15 @@ const COLS = ROWS.length + 1;
 				<th class="col-label">{st.faces}</th>
 				{
 					ROWS.map(({ d }) => (
-						<td style={elementStyle(d.element)}>
+						<td>
 							<div class="planet-chips">
-								{d.faces.map((e) => (
+								{d.faces.map((e, i) => (
 									<span
-										class="chip"
+										class="chip with-label"
 										style={planetStyle(e.planet)}
 										title={`${name(e.planet)} ${e.from}°–${e.to}°59′`}
 									>
+										<span class="chip-label">{st.faceOrdinals[i]}</span>
 										<span class="glyph">{symbol(e.planet)}</span>
 									</span>
 								))}
@@ -234,74 +235,72 @@ const COLS = ROWS.length + 1;
 			<tr>
 				<th class="col-label">{st.behavior}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td class="multiline" style={elementStyle(d.element)}>
-							{text(a.behavior)}
-						</td>
+					ROWS.map(({ a }) => (
+						<td class="multiline">{text(a.behavior)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.voice}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.voice)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.voice)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.fertility}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.fertility)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.fertility)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.flavor}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.flavor)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.flavor)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.direction}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.direction)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.direction)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.ascension}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.ascension)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.ascension)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.latitude}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.latitude)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.latitude)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.commandObey}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.commandObey)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.commandObey)}</td>
 					))
 				}
 			</tr>
 			<tr>
 				<th class="col-label">{st.solarLunar}</th>
 				{
-					ROWS.map(({ a, d }) => (
-						<td style={elementStyle(d.element)}>{text(a.solarLunar)}</td>
+					ROWS.map(({ a }) => (
+						<td>{text(a.solarLunar)}</td>
 					))
 				}
 			</tr>
@@ -312,64 +311,68 @@ const COLS = ROWS.length + 1;
 <SignsAccordion lang={lang} />
 
 <script>
-	// Toggle .stuck on the wrap while the sticky thead is pinned to the
-	// viewport top — fades in the gradient shadow under the header.
+	// Emulated sticky header: the overflow-x scroll container blocks real
+	// page-relative position: sticky on the thead at any width, so a scroll
+	// listener translates the header cells (and the shadow strip) by
+	// --stick-y instead. Clamped so the header parks at the table's bottom
+	// edge on the way out.
 	document.querySelectorAll<HTMLElement>(".table-wrap").forEach((wrap) => {
-		const sentinel = wrap.querySelector<HTMLElement>(".sticky-sentinel");
-		if (!sentinel) return;
-		new IntersectionObserver(([entry]) => {
-			wrap.classList.toggle("stuck", !entry.isIntersecting);
-		}).observe(sentinel);
+		const thead = wrap.querySelector<HTMLElement>("thead");
+		if (!thead) return;
+		const update = () => {
+			const y = Math.min(
+				Math.max(0, -wrap.getBoundingClientRect().top),
+				Math.max(0, wrap.clientHeight - thead.offsetHeight),
+			);
+			wrap.style.setProperty("--stick-y", `${y}px`);
+			wrap.style.setProperty("--thead-h", `${thead.offsetHeight}px`);
+			wrap.classList.toggle("stuck", y > 0);
+		};
+		addEventListener("scroll", update, { passive: true });
+		addEventListener("resize", update);
+		update();
 	});
 </script>
 
 <style>
+	/* overflow-y: hidden (not visible — that's impossible next to
+	   overflow-x: auto) so the shadow strip's last 8px clip at the table's
+	   bottom edge instead of growing a vertical scrollbar. No max-height /
+	   inner vertical scroller on this table — the page scrolls. */
 	.table-wrap {
 		overflow-x: auto;
+		overflow-y: hidden;
 	}
 
-	/* Once the table fits without horizontal scrolling, drop the scroll
-	   container — an overflow-x: auto ancestor blocks the thead's
-	   page-relative vertical sticky even when nothing actually scrolls.
-	   (Below this width the header simply doesn't stick — no max-height /
-	   inner vertical scroller on this table.) */
-	@media (min-width: 1460px) {
-		.table-wrap {
-			overflow: visible;
-		}
-
-		/* Gradient shadow under the stuck header — same recipe as the planets
-		   table, hung off the sticky cells themselves so it travels with them.
-		   Faded in via .stuck (toggled by the sentinel IntersectionObserver
-		   below); scoped to this media query because below it the header
-		   never sticks. */
-		table.signs thead th::after {
-			content: "";
-			position: absolute;
-			left: 0;
-			right: 0;
-			top: 100%;
-			height: 8px;
-			background: linear-gradient(
-				to bottom,
-				rgba(43, 38, 34, 0.25),
-				transparent
-			);
-			opacity: 0;
-			transition: opacity 0.15s ease;
-			pointer-events: none;
-		}
-
-		.table-wrap.stuck thead th::after {
-			opacity: 1;
-		}
+	/* One full-width gradient shadow under the stuck header — same recipe
+	   as the planets table. position: sticky; left: 0 pins it to the wrap's
+	   visible left edge during horizontal scrolling (as an in-flow block its
+	   width is the wrap's visible width, not the table's), and the
+	   translateY rides --stick-y (set by the scroll listener below) to sit
+	   just under the header cells. Zero net height (the negative margin
+	   pulls it back out of layout); faded in via .stuck. */
+	.table-wrap::before {
+		content: "";
+		display: block;
+		position: sticky;
+		left: 0;
+		height: 8px;
+		margin-bottom: -8px;
+		transform: translateY(
+			calc(var(--stick-y, 0px) + var(--thead-h, 0px))
+		);
+		background: linear-gradient(
+			to bottom,
+			rgba(43, 38, 34, 0.25),
+			transparent
+		);
+		opacity: 0;
+		transition: opacity 0.15s ease;
+		pointer-events: none;
 	}
 
-	/* 0-height probe for the IntersectionObserver that toggles .stuck —
-	   1px tall so it has a box to observe, pulled back out of layout. */
-	.sticky-sentinel {
-		height: 1px;
-		margin-bottom: -1px;
+	.table-wrap.stuck::before {
+		opacity: 1;
 	}
 
 	@media (max-width: 767px) {
@@ -379,8 +382,8 @@ const COLS = ROWS.length + 1;
 	}
 
 	/* Separate (non-collapsed) borders, each owned by exactly one cell, so
-	   the sticky header and label column carry their borders with them —
-	   same scheme as the planets table. */
+	   the sticky header carries its borders with it — same scheme as the
+	   planets table. */
 	table.signs {
 		--border: #a89c8c;
 		border-collapse: separate;
@@ -400,10 +403,10 @@ const COLS = ROWS.length + 1;
 		vertical-align: middle;
 	}
 
-	/* Each border is owned by one cell: the label column carries its right
-	   border (so the line sticks with it when horizontally scrolled), the
-	   cell next to it drops its left border to compensate, the last column
-	   closes the right edge, and the header row closes the top. */
+	/* Each border is owned by one cell: the label column keeps its right
+	   border (the cell next to it drops its left border to compensate),
+	   the last column closes the right edge, and the header row closes
+	   the top. */
 	table.signs .col-label + th,
 	table.signs .col-label + td {
 		border-left: none;
@@ -447,23 +450,14 @@ const COLS = ROWS.length + 1;
 		font-size: 0.8rem;
 	}
 
-	th.col-label {
-		position: sticky;
-		left: 0;
-		z-index: 1;
-	}
-
+	/* Emulated-sticky header cells — translated by --stick-y from the
+	   scroll listener. Only the header row sticks; the label column scrolls
+	   horizontally with the rest of the table. position: relative + z-index
+	   lift the cells over the tbody column-stripe backgrounds. */
 	table.signs thead th {
-		position: sticky;
-		top: 0;
+		position: relative;
 		z-index: 2;
-	}
-
-	/* Corner cell sticks on both axes, above the sign headers and the
-	   label column. */
-	table.signs thead th.col-label {
-		left: 0;
-		z-index: 3;
+		transform: translateY(var(--stick-y, 0px));
 	}
 
 	th.section-header {
@@ -475,14 +469,11 @@ const COLS = ROWS.length + 1;
 		padding: 0.4rem 0.6rem;
 	}
 
-	/* Subtle zebra over the element tints — a translucent white overlay on
-	   even rows (background-image layers over the inline element color, which
-	   must stay opaque for the sticky header). */
-	tbody tr:nth-child(even) td {
-		background-image: linear-gradient(
-			rgba(255, 255, 255, 0.35),
-			rgba(255, 255, 255, 0.35)
-		);
+	/* Alternating neutral column tones (instead of row zebra) — even table
+	   columns get the tint, odd ones stay on the page background. Body cells
+	   carry no element tint; only the thead is element-coded. */
+	tbody td:nth-child(even) {
+		background: #f5f0e8;
 	}
 
 	table.signs [title] {
@@ -503,10 +494,9 @@ const COLS = ROWS.length + 1;
 		justify-content: center;
 	}
 
-	/* Unlike the planets table's chips (which sit on a neutral background),
-	   these sit on element-tinted cells — the hairline border keeps pastel
-	   chips visible on pastel cells (and gives node chips, which have no
-	   planet color, a visible box). */
+	/* Unlike the planets table's chips, these include node chips, which have
+	   no planet color — the hairline border gives them a visible box (and
+	   keeps pastel chips distinct on the tinted stripe columns). */
 	.chip {
 		display: inline-flex;
 		align-items: center;
@@ -516,5 +506,19 @@ const COLS = ROWS.length + 1;
 		border-radius: 0.25rem;
 		border: 1px solid rgba(43, 38, 34, 0.2);
 		cursor: pointer;
+	}
+
+	/* Terms/faces chips carry a small text label beside the glyph (start
+	   degree after it, face ordinal before it) — these grow horizontally
+	   instead of staying square. */
+	.chip.with-label {
+		width: auto;
+		padding: 0 0.3rem;
+		gap: 0.2rem;
+	}
+
+	.chip-label {
+		font-size: 0.7rem;
+		line-height: 1;
 	}
 </style>
