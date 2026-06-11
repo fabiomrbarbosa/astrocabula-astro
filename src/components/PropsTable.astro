@@ -1,0 +1,87 @@
+---
+// Label/value property table for attribute sections in the mobile
+// accordions: property name in a tinted left column, value on the right.
+// Slotted children are alternating .prop-label / .prop-value spans (direct
+// children — they're the grid items); values can hold plain text or richer
+// markup (e.g. planet chips). `.prop-value.multiline` preserves line
+// breaks.
+//
+// `columns={n}` flips the layout to n columns with the label on top and the
+// value beneath (e.g. the Planetary Years row) — same child order, the
+// column-major grid flow does the transposing.
+
+interface Props {
+	columns?: number | undefined;
+}
+
+const { columns } = Astro.props;
+---
+
+<div
+	class:list={["props", { columns }]}
+	style={columns ? `--cols: ${columns}` : undefined}
+>
+	<slot />
+</div>
+
+<style>
+	.props {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		border: 1px solid var(--border);
+	}
+
+	.props > :global(.prop-label) {
+		display: flex;
+		align-items: center;
+		padding: 0.4rem 0.5rem;
+		background: var(--surface-head);
+		border-right: 1px solid var(--border);
+		font-weight: 600;
+		font-size: 0.7rem;
+	}
+
+	.props > :global(.prop-value) {
+		display: flex;
+		align-items: center;
+		padding: 0.4rem 0.5rem;
+	}
+
+	/* Internal hairlines: every row after the first (labels are odd grid
+	   children, values even — the sibling selector skips only the first of
+	   each). */
+	.props > :global(.prop-label ~ .prop-label),
+	.props > :global(.prop-value ~ .prop-value) {
+		border-top: 1px solid var(--border);
+	}
+
+	.props > :global(.prop-value.multiline) {
+		white-space: pre-line;
+	}
+
+	/* Column mode: labels across the top, values beneath, content centered.
+	   Hairlines move from between rows to between columns (skipping the last
+	   pair) and under the label row. */
+	.props.columns {
+		grid-auto-flow: column;
+		grid-template-rows: auto 1fr;
+		grid-template-columns: repeat(var(--cols), 1fr);
+	}
+
+	.props.columns > :global(.prop-label),
+	.props.columns > :global(.prop-value) {
+		justify-content: center;
+		border-top: none;
+		border-right: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.props.columns > :global(.prop-label) {
+		border-bottom: 1px solid var(--border);
+	}
+
+	.props.columns > :global(.prop-label:nth-last-child(-n + 2)),
+	.props.columns > :global(.prop-value:nth-last-child(-n + 2)) {
+		border-right: none;
+	}
+</style>

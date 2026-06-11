@@ -1,0 +1,92 @@
+---
+// One planet-tinted dignity cell of a mobile accordion (used by
+// DignitiesAccordion and SignsAccordion): uppercase dignity label on top,
+// bare glyph below (the table conventions — tint and tooltip on the cell,
+// no visible planet name), optional exaltation/fall degree, optional
+// triplicity role (tooltip only) and "J" joy badge.
+import type { Planet } from "../data/dignities";
+import { defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+
+interface Props {
+	lang?: Lang;
+	planet: Planet;
+	label: string;
+	degree?: number | undefined;
+	role?: "day" | "night" | "participant" | undefined;
+	joy?: boolean;
+}
+
+const {
+	lang = defaultLang,
+	planet,
+	label,
+	degree,
+	role,
+	joy = false,
+} = Astro.props;
+const { name, dignityLabel, triplicityLabel, joyLabel } = makeLabels(lang);
+
+const title = joy
+	? joyLabel(planet)
+	: role
+		? triplicityLabel(planet, role)
+		: degree !== undefined
+			? dignityLabel({ planet, degree })
+			: name(planet);
+---
+
+<div class="cell" style={planetStyle(planet)} title={title}>
+	<span class="cell-label">{label}</span>
+	{
+		degree !== undefined ? (
+			<span class="cell-value">
+				<span class="glyph">{symbol(planet)}</span>
+				<sup>{degree}°</sup>
+			</span>
+		) : (
+			<span class="glyph">{symbol(planet)}</span>
+		)
+	}
+	{joy && <span class="tri-label">J</span>}
+</div>
+
+<style>
+	.cell {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.4rem 0.25rem;
+		border: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.cell-label {
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-size: 1.75rem;
+		line-height: 1.2;
+		display: inline-block;
+	}
+
+	sup {
+		font-size: 1em;
+	}
+
+	/* Corner joy badge — fixed offsets (no --tick-spacing here) and a plain
+	   serif so the "J" doesn't pick up Reforma1918. */
+	.tri-label {
+		position: absolute;
+		right: 0.25rem;
+		bottom: 0.25rem;
+		line-height: 1;
+		font-family: Georgia, Times, serif;
+	}
+</style>

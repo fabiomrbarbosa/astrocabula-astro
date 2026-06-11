@@ -16,6 +16,22 @@ const path = Astro.url.pathname.replace(/\/?$/, "/");
 const basePath = lang === "pt" ? path.replace(/^\/pt/, "") || "/" : path;
 const enHref = basePath;
 const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
+
+const navItems = [
+	{ href: lang === "pt" ? "/pt/" : "/", base: "/", label: t.nav.dignities },
+	{
+		href: lang === "pt" ? "/pt/planets/" : "/planets/",
+		base: "/planets/",
+		label: t.nav.planets,
+	},
+	{
+		href: lang === "pt" ? "/pt/signs/" : "/signs/",
+		base: "/signs/",
+		label: t.nav.signs,
+	},
+].map((item) => ({ ...item, current: basePath === item.base }));
+
+const currentNavItem = navItems.find((item) => item.current);
 ---
 
 <!doctype html>
@@ -79,11 +95,51 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 				<span class="brand-short">{t.siteNameShort}</span>
 			</a>
 			<nav>
-				<a href={lang === "pt" ? "/pt/" : "/"}>{t.nav.dignities}</a>
-				<a href={lang === "pt" ? "/pt/planets/" : "/planets/"}
-					>{t.nav.planets}</a
-				>
-				<a href={lang === "pt" ? "/pt/signs/" : "/signs/"}>{t.nav.signs}</a>
+				<div class="nav-links">
+					{
+						navItems.map((item) => (
+							<a
+								href={item.href}
+								class={item.current ? "active" : ""}
+								aria-current={item.current ? "page" : undefined}
+							>
+								{item.label}
+							</a>
+						))
+					}
+				</div>
+				<details class="nav-dropdown">
+					<summary>
+						<span>{currentNavItem?.label}</span>
+						<span class="chevron" aria-hidden="true">
+							<svg
+								viewBox="0 0 16 16"
+								width="10"
+								height="10"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M3 6 L8 11 L13 6"></path>
+							</svg>
+						</span>
+					</summary>
+					<div class="nav-dropdown-menu">
+						{
+							navItems.map((item) => (
+								<a
+									href={item.href}
+									class={item.current ? "active" : ""}
+									aria-current={item.current ? "page" : undefined}
+								>
+									{item.label}
+								</a>
+							))
+						}
+					</div>
+				</details>
 				<span class="lang-switcher">
 					<a
 						href={enHref}
@@ -120,6 +176,12 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 			document.querySelectorAll(".lang-switcher a").forEach(function (a) {
 				a.addEventListener("click", function () {
 					localStorage.setItem("astrocabula-lang", a.dataset.lang || "en");
+				});
+			});
+
+			document.addEventListener("click", function (e) {
+				document.querySelectorAll(".nav-dropdown[open]").forEach(function (d) {
+					if (!d.contains(e.target)) d.removeAttribute("open");
 				});
 			});
 		</script>
@@ -187,11 +249,33 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 
 	:root {
 		color-scheme: light dark;
-		--bg: #faf8f4;
-		--fg: #2b2622;
-		--muted: #756d64;
-		--border: #c9bdac;
-		--accent: #5c5347;
+
+		/* Neutral ramp, light → dark. No semantic meaning — components use
+		   the aliases below, never the raw steps. --ink-rgb is the darkest
+		   step as bare RGB channels, for rgba() alpha tints. */
+		--neutral-0: #faf8f4;
+		--neutral-1: #f7f4ee;
+		--neutral-2: #f5f0e8;
+		--neutral-3: #f0ebe2;
+		--neutral-4: #e9e2d6;
+		--neutral-5: #c9bdac;
+		--neutral-6: #a89c8c;
+		--neutral-7: #756d64;
+		--neutral-8: #5c5347;
+		--neutral-9: #2b2622;
+		--ink-rgb: 43, 38, 34;
+
+		/* Semantic aliases */
+		--bg: var(--neutral-0);
+		--fg: var(--neutral-9);
+		--muted: var(--neutral-7);
+		--border: var(--neutral-5);
+		--border-strong: var(--neutral-6);
+		--accent: var(--neutral-8);
+		--surface-active: var(--neutral-1);
+		--surface-stripe: var(--neutral-2);
+		--surface-head: var(--neutral-3);
+		--surface-section: var(--neutral-4);
 	}
 
 	* {
@@ -262,14 +346,95 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 		gap: 1rem;
 	}
 
-	.site-header nav a {
+	.nav-links {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+
+	.nav-links a {
 		color: var(--fg);
 		text-decoration: none;
 		font-size: 0.95rem;
+		padding: 0.3rem 0.85rem;
+		border-radius: 999px;
+		transition: background-color 0.15s ease, color 0.15s ease;
 	}
 
-	.site-header nav a:hover {
-		text-decoration: underline;
+	.nav-links a:hover,
+	.nav-links a:focus-visible {
+		background: var(--surface-head);
+	}
+
+	.nav-links a.active {
+		background: var(--accent);
+		color: var(--bg);
+		font-weight: bold;
+	}
+
+	.nav-dropdown {
+		display: none;
+		position: relative;
+	}
+
+	.nav-dropdown summary {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		list-style: none;
+		cursor: pointer;
+		padding: 0.3rem 0.85rem;
+		border-radius: 999px;
+		background: var(--surface-head);
+		font-size: 0.95rem;
+		color: var(--fg);
+	}
+
+	.nav-dropdown summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.nav-dropdown .chevron {
+		display: inline-flex;
+		color: var(--muted);
+		transition: transform 0.15s ease;
+	}
+
+	.nav-dropdown[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.nav-dropdown-menu {
+		position: absolute;
+		top: calc(100% + 0.35rem);
+		left: 0;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		min-width: 9rem;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 0.75rem;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(var(--ink-rgb), 0.08);
+	}
+
+	.nav-dropdown-menu a {
+		padding: 0.5rem 0.85rem;
+		color: var(--fg);
+		text-decoration: none;
+		font-size: 0.9rem;
+	}
+
+	.nav-dropdown-menu a:hover,
+	.nav-dropdown-menu a:focus-visible {
+		background: var(--surface-active);
+	}
+
+	.nav-dropdown-menu a.active {
+		font-weight: bold;
+		background: var(--surface-active);
 	}
 
 	.lang-switcher {
@@ -285,10 +450,10 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 		margin-left: 0;
 		padding: 0.2rem 0.65rem;
 		color: var(--muted);
+		text-decoration: none;
 	}
 
 	.lang-switcher a:hover {
-		text-decoration: none;
 		color: var(--fg);
 	}
 
@@ -342,7 +507,16 @@ const ptHref = basePath === "/" ? "/pt/" : `/pt${basePath}`;
 			font-size: 1.1rem;
 		}
 
-		.site-header nav a {
+		.nav-links {
+			display: none;
+		}
+
+		.nav-dropdown {
+			display: block;
+		}
+
+		.nav-dropdown summary,
+		.nav-dropdown-menu a {
 			font-size: 0.85rem;
 		}
 

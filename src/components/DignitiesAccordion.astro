@@ -1,8 +1,12 @@
 ---
 import { SIGNS } from "../data/dignities";
 import { ui, defaultLang, type Lang } from "../i18n";
-import { JOY_SIGNS, makeLabels, planetStyle, symbol } from "./dignities-shared";
+import { JOY_SIGNS, makeLabels } from "./dignities-shared";
+import AccordionItem from "./AccordionItem.astro";
 import DegreeRuler from "./DegreeRuler.astro";
+import DignityCell from "./DignityCell.astro";
+import MobileAccordion from "./MobileAccordion.astro";
+import { elementStyle } from "./signs-shared";
 
 interface Props {
 	lang?: Lang;
@@ -10,232 +14,101 @@ interface Props {
 
 const { lang = defaultLang } = Astro.props;
 const t = ui[lang];
-const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
-	makeLabels(lang);
+const { signName } = makeLabels(lang);
 ---
 
-<div class="dignities-accordion">
+<MobileAccordion>
 	{
 		SIGNS.map((s) => (
-			<details name="dignities">
-				<summary>
-					<span class="glyph">{s.symbol}</span>
-					<span class="sign-name">{signName(s.sign)}</span>
-					<span class="chevron" aria-hidden="true">
-						<svg
-							viewBox="0 0 16 16"
-							width="10"
-							height="10"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M3 6 L8 11 L13 6" />
-						</svg>
-					</span>
-				</summary>
-				<div class="body">
-					<div class="pair-row">
-						<div
-							class="cell"
-							style={planetStyle(s.throne)}
-							title={
-								JOY_SIGNS.has(s.sign) ? joyLabel(s.throne) : name(s.throne)
-							}
-						>
-							<span class="cell-label">{t.table.throne} +5</span>
-							<span class="glyph">{symbol(s.throne)}</span>
-							{JOY_SIGNS.has(s.sign) && <span class="tri-label">J</span>}
-						</div>
-						{s.exaltation && (
-							<div
-								class="cell"
-								style={planetStyle(s.exaltation.planet)}
-								title={dignityLabel(s.exaltation)}
-							>
-								<span class="cell-label">{t.table.exaltFull} +4</span>
-								<span class="cell-value">
-									<span class="glyph">{symbol(s.exaltation.planet)}</span>
-									{s.exaltation.degree !== undefined && (
-										<sup>{s.exaltation.degree}°</sup>
-									)}
-								</span>
-							</div>
-						)}
-					</div>
-					<section>
-						<h3>{t.table.triplicities} +3</h3>
-						<div class="tri-row">
-							<div
-								class="cell"
-								style={planetStyle(s.triplicity.day)}
-								title={triplicityLabel(s.triplicity.day, "day")}
-							>
-								<span class="cell-label">{t.table.day}</span>
-								<span class="glyph">{symbol(s.triplicity.day)}</span>
-							</div>
-							<div
-								class="cell"
-								style={planetStyle(s.triplicity.night)}
-								title={triplicityLabel(s.triplicity.night, "night")}
-							>
-								<span class="cell-label">{t.table.night}</span>
-								<span class="glyph">{symbol(s.triplicity.night)}</span>
-							</div>
-							<div
-								class="cell"
-								style={planetStyle(s.triplicity.participant)}
-								title={triplicityLabel(s.triplicity.participant, "participant")}
-							>
-								<span class="cell-label">{t.table.participant}</span>
-								<span class="glyph">{symbol(s.triplicity.participant)}</span>
-							</div>
-						</div>
-					</section>
-					<section>
-						<h3>{t.table.terms} +2</h3>
-						<div class="ruler-host">
-							<DegreeRuler lang={lang} entries={s.terms} fullTicks labels />
-						</div>
-					</section>
-					<section>
-						<h3>{t.table.faces} +1</h3>
-						<div class="ruler-host">
-							<DegreeRuler lang={lang} entries={s.faces} fullTicks labels />
-						</div>
-					</section>
-					<div class="pair-row">
-						<div
-							class="cell"
-							style={planetStyle(s.exile)}
-							title={name(s.exile)}
-						>
-							<span class="cell-label">{t.table.exile} −5</span>
-							<span class="glyph">{symbol(s.exile)}</span>
-						</div>
-						{s.fall && (
-							<div
-								class="cell"
-								style={planetStyle(s.fall.planet)}
-								title={dignityLabel(s.fall)}
-							>
-								<span class="cell-label">{t.table.fall} −4</span>
-								<span class="cell-value">
-									<span class="glyph">{symbol(s.fall.planet)}</span>
-									{s.fall.degree !== undefined && <sup>{s.fall.degree}°</sup>}
-								</span>
-							</div>
-						)}
-					</div>
-					<section>
-						<h3>{t.table.almuten}</h3>
-						<div class="ruler-host">
-							<DegreeRuler lang={lang} entries={s.almuten} fullTicks labels />
-						</div>
-					</section>
+			<AccordionItem
+				group="dignities"
+				symbol={s.symbol}
+				glyphStyle={elementStyle(s.element)}
+				label={signName(s.sign)}
+			>
+				<div class="pair-row">
+					<DignityCell
+						lang={lang}
+						planet={s.throne}
+						label={`${t.table.throne} +5`}
+						joy={JOY_SIGNS.has(s.sign)}
+					/>
+					{s.exaltation && (
+						<DignityCell
+							lang={lang}
+							planet={s.exaltation.planet}
+							label={`${t.table.exaltFull} +4`}
+							degree={s.exaltation.degree}
+						/>
+					)}
 				</div>
-			</details>
+				<section>
+					<h3>{t.table.triplicities} +3</h3>
+					<div class="tri-row">
+						<DignityCell
+							lang={lang}
+							planet={s.triplicity.day}
+							label={t.table.day}
+							role="day"
+						/>
+						<DignityCell
+							lang={lang}
+							planet={s.triplicity.night}
+							label={t.table.night}
+							role="night"
+						/>
+						<DignityCell
+							lang={lang}
+							planet={s.triplicity.participant}
+							label={t.table.participant}
+							role="participant"
+						/>
+					</div>
+				</section>
+				<section>
+					<h3>{t.table.terms} +2</h3>
+					<div class="ruler-host">
+						<DegreeRuler lang={lang} entries={s.terms} fullTicks labels />
+					</div>
+				</section>
+				<section>
+					<h3>{t.table.faces} +1</h3>
+					<div class="ruler-host">
+						<DegreeRuler lang={lang} entries={s.faces} fullTicks labels />
+					</div>
+				</section>
+				<div class="pair-row">
+					<DignityCell
+						lang={lang}
+						planet={s.exile}
+						label={`${t.table.exile} −5`}
+					/>
+					{s.fall && (
+						<DignityCell
+							lang={lang}
+							planet={s.fall.planet}
+							label={`${t.table.fall} −4`}
+							degree={s.fall.degree}
+						/>
+					)}
+				</div>
+				<section>
+					<h3>{t.table.almuten}</h3>
+					<div class="ruler-host">
+						<DegreeRuler lang={lang} entries={s.almuten} fullTicks labels />
+					</div>
+				</section>
+			</AccordionItem>
 		))
 	}
-</div>
-
-<script>
-	import { setupAccordionAnimation } from "./accordion-animation";
-
-	setupAccordionAnimation(".dignities-accordion");
-</script>
+</MobileAccordion>
 
 <style>
-	/* Mobile counterpart of the table — shown only below 768px (the table's
-	   .table-wrap carries the mirror-image rule in DignitiesTable.astro). */
-	.dignities-accordion {
-		--border: #a89c8c;
-		display: none;
-	}
-
-	@media (max-width: 767px) {
-		.dignities-accordion {
-			display: block;
-		}
-	}
-
-	details {
-		border: 1px solid var(--border);
-	}
-
-	details + details {
-		border-top: none;
-	}
-
-	summary {
-		list-style: none;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.4rem 0.75rem;
-		background: #f0ebe2;
-		cursor: pointer;
+	section h3 {
+		margin: 0 0 0.35rem;
 		font-weight: 600;
 		font-size: 0.8rem;
 		text-transform: uppercase;
-	}
-
-	summary::-webkit-details-marker {
-		display: none;
-	}
-
-	details[open] summary,
-	summary:focus-visible {
-		background: #f7f4ee;
-	}
-
-	.dignities-accordion *,
-	.dignities-accordion *:focus-visible {
-		outline: none;
-		-webkit-tap-highlight-color: transparent;
-	}
-
-	/* Astronomicon has no bold cut — keep the summary's 600 weight off the
-	   glyph so the browser doesn't synthesize a faux-bold. Fixed width +
-	   centering keeps the following sign name aligned regardless of how
-	   wide each glyph renders. */
-	summary .glyph {
-		display: inline-flex;
-		justify-content: center;
-		width: 1.75rem;
-		font-weight: normal;
-	}
-
-	.chevron {
-		display: inline-flex;
-		margin-left: auto;
-		color: var(--muted);
-		transition: transform 0.15s ease;
-	}
-
-	details[open] .chevron {
-		transform: rotate(180deg);
-	}
-
-	.glyph {
-		font-family: "Astronomicon", serif;
-		font-size: 1.75rem;
-		line-height: 1.2;
-		display: inline-block;
-	}
-
-	.body {
-		display: grid;
-		gap: 0.75rem;
-		padding: 0.75rem;
-		border-top: 1px solid var(--border);
-		font-size: 0.75rem;
-	}
-
-	.body [title] {
-		cursor: pointer;
 	}
 
 	.pair-row {
@@ -246,7 +119,7 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 
 	/* Signs without an exaltation/fall omit that cell — let the remaining
 	   throne/exile cell take the whole row. */
-	.pair-row .cell:only-child {
+	.pair-row > :global(.cell:only-child) {
 		grid-column: 1 / -1;
 	}
 
@@ -254,40 +127,6 @@ const { name, signName, dignityLabel, triplicityLabel, joyLabel } =
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		gap: 0.5rem;
-	}
-
-	.cell {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.4rem 0.25rem;
-		border: 1px solid var(--border);
-		text-align: center;
-	}
-
-	.tri-label {
-		position: absolute;
-		right: 0.25rem;
-		bottom: 0.25rem;
-		line-height: 1;
-		font-family: Georgia, Times, serif;
-	}
-
-	.cell-label,
-	section h3 {
-		font-weight: 600;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-	}
-
-	section h3 {
-		margin: 0 0 0.35rem;
-	}
-
-	.cell sup {
-		font-size: 1em;
 	}
 
 	.ruler-host {

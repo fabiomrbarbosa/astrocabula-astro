@@ -8,6 +8,7 @@ import {
 	makePlanetsLabels,
 	toRoman,
 } from "./planets-shared";
+import { elementStyle } from "./signs-shared";
 import PlanetsAccordion from "./PlanetsAccordion.astro";
 
 interface Props {
@@ -57,11 +58,7 @@ const COLS = PLANETS.length + 1;
 			</tr>
 			<tr>
 				<th class="col-label">{pt.temperament}</th>
-				{
-					PLANETS.map((p) => (
-						<td class="multiline">{text(p.temperament)}</td>
-					))
-				}
+				{PLANETS.map((p) => <td class="multiline">{text(p.temperament)}</td>)}
 			</tr>
 			<tr>
 				<th class="col-label">{pt.gender}</th>
@@ -78,6 +75,10 @@ const COLS = PLANETS.length + 1;
 			<tr>
 				<th class="col-label">{pt.halfOrb}</th>
 				{PLANETS.map((p) => <td>{p.halfOrb}°</td>)}
+			</tr>
+			<tr>
+				<th class="col-label">{pt.moiety}</th>
+				{PLANETS.map((p) => <td>{p.moiety}°</td>)}
 			</tr>
 		</tbody>
 		<tbody>
@@ -198,7 +199,7 @@ const COLS = PLANETS.length + 1;
 								{domicileSigns(p.planet).map((s) => (
 									<span
 										class="chip"
-										style={planetStyle(p.planet)}
+										style={elementStyle(s.element)}
 										title={signName(s.sign)}
 									>
 										<span class="glyph">{s.symbol}</span>
@@ -220,7 +221,7 @@ const COLS = PLANETS.length + 1;
 									<div class="planet-chips">
 										<span
 											class="chip"
-											style={planetStyle(p.planet)}
+											style={elementStyle(sign.element)}
 											title={signName(sign.sign)}
 										>
 											<span class="glyph">{sign.symbol}</span>
@@ -285,12 +286,10 @@ const COLS = PLANETS.length + 1;
 		left: 0;
 		height: 8px;
 		margin-bottom: -8px;
-		transform: translateY(
-			calc(var(--stick-y, 0px) + var(--thead-h, 0px))
-		);
+		transform: translateY(calc(var(--stick-y, 0px) + var(--thead-h, 0px)));
 		background: linear-gradient(
 			to bottom,
-			rgba(43, 38, 34, 0.25),
+			rgba(var(--ink-rgb), 0.25),
 			transparent
 		);
 		opacity: 0;
@@ -315,7 +314,7 @@ const COLS = PLANETS.length + 1;
 	   border owned by exactly one cell, the sticky header carries its
 	   borders with it — no repaint hacks needed. */
 	table.planets {
-		--border: #a89c8c;
+		--border: var(--border-strong);
 		border-collapse: separate;
 		border-spacing: 0;
 		width: 100%;
@@ -364,7 +363,7 @@ const COLS = PLANETS.length + 1;
 	th.col-label {
 		text-align: left;
 		font-weight: 600;
-		background: #f0ebe2;
+		background: var(--surface-head);
 	}
 
 	td.multiline {
@@ -374,10 +373,6 @@ const COLS = PLANETS.length + 1;
 	thead th.col-label {
 		text-transform: uppercase;
 		font-size: 0.8rem;
-	}
-
-	thead th.col-planet {
-		font-weight: 600;
 	}
 
 	/* Emulated-sticky header cells — translated by --stick-y from the
@@ -391,7 +386,7 @@ const COLS = PLANETS.length + 1;
 	}
 
 	th.section-header {
-		background: #e9e2d6;
+		background: var(--surface-section);
 		text-align: left;
 		text-transform: uppercase;
 		font-size: 0.8rem;
@@ -403,7 +398,7 @@ const COLS = PLANETS.length + 1;
 	   columns get the tint, odd ones stay on the page background. Body cells
 	   carry no per-planet color; only the thead is planet-coded. */
 	tbody td:nth-child(even) {
-		background: #f5f0e8;
+		background: var(--surface-stripe);
 	}
 
 	.glyph {
@@ -427,6 +422,7 @@ const COLS = PLANETS.length + 1;
 		width: 1.75rem;
 		height: 1.75rem;
 		border-radius: 0.25rem;
+		border: 1px solid rgba(var(--ink-rgb), 0.2);
 		cursor: pointer;
 	}
 </style>

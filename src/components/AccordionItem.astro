@@ -1,0 +1,112 @@
+---
+// One <details> section of a mobile accordion: glyph + name summary with a
+// chevron, slot for the body. The shared `group` name gives native
+// exclusive-open with no JS; accordion-animation.ts removes it when it
+// drives the toggling itself (see the note there).
+
+interface Props {
+	group: string;
+	symbol: string;
+	glyphStyle?: string | undefined;
+	label: string;
+}
+
+const { group, symbol, glyphStyle, label } = Astro.props;
+---
+
+<details name={group}>
+	<summary>
+		<span class="glyph" style={glyphStyle}>{symbol}</span>
+		<span class="item-name">{label}</span>
+		<span class="chevron" aria-hidden="true">
+			<svg
+				viewBox="0 0 16 16"
+				width="10"
+				height="10"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M3 6 L8 11 L13 6"></path>
+			</svg>
+		</span>
+	</summary>
+	<div class="body"><slot /></div>
+</details>
+
+<style>
+	details {
+		border: 1px solid var(--border);
+	}
+
+	details + details {
+		border-top: none;
+	}
+
+	summary {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.4rem 0.75rem;
+		background: var(--surface-head);
+		cursor: pointer;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	details[open] summary,
+	summary:focus-visible {
+		background: var(--surface-active);
+	}
+
+	/* Astronomicon has no bold cut — keep the summary's 600 weight off the
+	   glyph so the browser doesn't synthesize a faux-bold. The fixed-size
+	   centered box keeps the following name aligned regardless of how wide
+	   each glyph renders, and shows the tint (planet/element pages) as a
+	   rounded chip. */
+	summary .glyph {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid rgba(var(--ink-rgb), 0.2);
+		font-family: "Astronomicon", serif;
+		font-weight: normal;
+		font-size: 1.25rem;
+		line-height: 1.2;
+	}
+
+	.chevron {
+		display: inline-flex;
+		margin-left: auto;
+		color: var(--muted);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.body {
+		display: grid;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.75rem;
+	}
+
+	/* Slotted cells/segments carry localized tooltips on [title]. */
+	.body :global([title]) {
+		cursor: pointer;
+	}
+</style>

@@ -16,6 +16,11 @@ export interface PlanetAttributes {
 	sect: BilingualText;
 	benefic: BilingualText;
 	halfOrb: number;
+	// Half of the half-orb, as a fraction (e.g. "4 1/2") rather than a
+	// decimal — half-orbs are all whole or half degrees, so the only
+	// fractional part that occurs is 1/2. Degree sign added at render time,
+	// like halfOrb.
+	moiety: string;
 	friends: Planet[];
 	enemies: Planet[];
 	avgSpeed: string;
@@ -38,6 +43,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Diurnal", pt: "Diurno" },
 		benefic: { en: "Malefic", pt: "Maléfico" },
 		halfOrb: 9,
+		moiety: "4 1/2",
 		friends: ["Moon", "Mercury", "Sun", "Jupiter"],
 		enemies: ["Venus", "Mars"],
 		avgSpeed: "0°02′",
@@ -57,6 +63,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Diurnal", pt: "Diurno" },
 		benefic: { en: "Benefic", pt: "Benéfico" },
 		halfOrb: 9,
+		moiety: "4 1/2",
 		friends: ["Moon", "Mercury", "Venus", "Sun", "Saturn"],
 		enemies: ["Mars"],
 		avgSpeed: "0°05′",
@@ -76,6 +83,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Nocturnal", pt: "Nocturno" },
 		benefic: { en: "Malefic", pt: "Maléfico" },
 		halfOrb: 8,
+		moiety: "4",
 		friends: ["Venus"],
 		enemies: ["Moon", "Mercury", "Sun", "Jupiter", "Saturn"],
 		avgSpeed: "0°31′",
@@ -97,10 +105,11 @@ export const PLANETS: PlanetAttributes[] = [
 		gender: { en: "Masculine", pt: "Masculino" },
 		sect: { en: "Diurnal", pt: "Diurno" },
 		benefic: {
-			en: "Mod. Benefic (Malefic by conjunction)",
-			pt: "Mod. Benéfico (Maléfico por conjunção)",
+			en: "Moderately Benefic (Malefic by conjunction)",
+			pt: "Moderadamente Benéfico (Maléfico por conjunção)",
 		},
 		halfOrb: 15,
+		moiety: "7 1/2",
 		friends: ["Venus", "Jupiter", "Saturn"],
 		enemies: ["Moon", "Mercury", "Mars"],
 		avgSpeed: "0°59′",
@@ -126,6 +135,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Nocturnal", pt: "Nocturno" },
 		benefic: { en: "Benefic", pt: "Benéfico" },
 		halfOrb: 7,
+		moiety: "3 1/2",
 		friends: ["Moon", "Mercury", "Sun", "Mars", "Jupiter"],
 		enemies: ["Saturn"],
 		avgSpeed: "0°59′",
@@ -148,6 +158,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Common", pt: "Comum" },
 		benefic: { en: "Common", pt: "Comum" },
 		halfOrb: 7,
+		moiety: "3 1/2",
 		friends: ["Venus", "Jupiter", "Saturn"],
 		enemies: ["Moon", "Sun", "Mars"],
 		avgSpeed: "0°59′",
@@ -170,6 +181,7 @@ export const PLANETS: PlanetAttributes[] = [
 		sect: { en: "Nocturnal", pt: "Nocturno" },
 		benefic: { en: "Variable", pt: "Variável" },
 		halfOrb: 12,
+		moiety: "6",
 		friends: ["Venus", "Jupiter", "Saturn"],
 		enemies: ["Mercury", "Sun", "Mars"],
 		avgSpeed: "13°11′",

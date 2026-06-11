@@ -37,6 +37,10 @@ Attributes (`/signs/`) — each with a Portuguese variant under `/pt/`.
   accordion" below).
 - `src/components/DignitiesAccordion.astro` — mobile counterpart of the table
   (shown below 768px; see "Mobile accordion" below).
+- `src/components/MobileAccordion.astro` + `AccordionItem.astro` — shared
+  shell for all three mobile accordions; `DignityCell.astro` and
+  `PropsTable.astro` are the shared body building blocks (see "Mobile
+  accordion" below).
 - `src/components/DegreeRuler.astro` — shared 0–30° degree-ruler used by both
   the table's body cells (Terms/Faces/Almuten) and the accordion (see "Degree
   rulers" below).
@@ -58,7 +62,11 @@ triplicityLabel }` (avoids threading `lang` through every call).
   `planets-shared.ts`, `src/data/planets.ts` — Planetary Attributes page
   (`src/pages/planets/`, `pt/planets/`): one column per planet, attribute
   rows grouped under full-width `th.section-header` rows (Nature, Affinity,
-  Cycles, Planetary Years, Rulerships). See "Attribute tables" below.
+  Cycles, Planetary Years, Rulerships). See "Attribute tables" below. The
+  Nature section's `moiety` field (half of `halfOrb`) is precomputed in
+  `planets.ts` as a fraction string (e.g. `"4 1/2"`, not `"4.5"`) — the `°`
+  is appended at render time, same as `halfOrb`. The "Moiety" label is used
+  as-is in both `en` and `pt` (no Portuguese translation).
 - `src/components/SignsTable.astro` + `SignsAccordion.astro`,
   `signs-shared.ts`, `src/data/signs.ts` — Sign Attributes page
   (`src/pages/signs/`, `pt/signs/`): one column per sign; ruler/exaltation/
@@ -142,36 +150,69 @@ single-domicile planets). For these signs, the throne/ruler cell gets a small
 "J" badge — `<span class="tri-label">J</span>`, reusing the same corner-badge
 class and styling as the triplicities' D/N/P labels — and its tooltip becomes
 `joyLabel(planet)` ("Planet (Joy)" / "Planeta (Gáudio)") instead of the plain
-planet name. Implemented in both `DignitiesTable.astro` (`td.col-throne`,
-added to the `position: relative` cell list) and `DignitiesAccordion.astro`
-(`.cell`, now `position: relative`, with its own `.tri-label` using fixed
-`0.25rem` offsets instead of the table's `--tick-spacing`, and `font-family:
-Georgia, Times, serif` so the "J" doesn't pick up Reforma1918). The English
-"Throne" header/label was renamed to "Ruler" (`t.table.throne`); Portuguese
-stays "Trono".
+planet name. Implemented in `DignitiesTable.astro` (`td.col-throne`, added to
+the `position: relative` cell list) and `DignityCell.astro` (`joy` prop —
+used by both the Dignities and Signs accordions' ruler cells; its
+`.tri-label` uses fixed `0.25rem` offsets instead of the table's
+`--tick-spacing`, and `font-family: Georgia, Times, serif` so the "J"
+doesn't pick up Reforma1918). The English "Throne" header/label was renamed
+to "Ruler" (`t.table.throne`); Portuguese stays "Trono".
 
 ## Mobile accordion
 
-`DignitiesAccordion.astro` replaces the table below 768px — the toggle is
-CSS-only (`@media (max-width: 767px)`: `.table-wrap` hides in
-`DignitiesTable.astro`, `.dignities-accordion` shows in the accordion's own
-styles; both stay in the DOM — static site). It renders inside
-`DignitiesTable.astro` after `.table-wrap`, so pages only ever use
-`<DignitiesTable>`.
+Each page's accordion replaces its table below 768px — the toggle is
+CSS-only (`@media (max-width: 767px)`: `.table-wrap` hides in the table
+component, `.mobile-accordion` shows in `MobileAccordion.astro`; both stay
+in the DOM — static site). Each accordion renders inside its table component
+after `.table-wrap`, so pages only ever use the table component.
 
-- One `<details name="dignities">` per sign — the shared `name` gives native
-  exclusive-open (one sign at a time) with no JS; older browsers degrade to
-  multi-open. The `<summary>` shows the sign glyph + localized name, styled
-  like the table's `thead` (`#f0ebe2`, uppercase 600); `summary .glyph` resets
-  `font-weight: normal` so Astronomicon isn't faux-bolded.
-- Body order: Throne + Exaltation (two-up row), Triplicities (three-up),
-  Terms ruler, Faces ruler, Exile + Fall (two-up row), Almuten ruler.
-  Section labels reuse `t.table.*` with the score appended ("+5"… "−4";
-  Almuten bare) — there's no score row on mobile. Exaltation is spelled in
-  full (`t.table.exaltFull`), unlike the table's abbreviated header.
-- If a sign has no exaltation (or no fall), that cell is omitted and Throne
-  (or Exile) spans the full row (`.cell:only-child { grid-column: 1 / -1 }`) —
-  no "—" placeholder on mobile.
+Shared components (all three accordions are thin compositions of these):
+
+- `MobileAccordion.astro` — the `.mobile-accordion` wrapper: <768px swap,
+  `--border: var(--border-strong)` override, the no-outline rule (see
+  below), and the single `setupAccordionAnimation(".mobile-accordion")`
+  call.
+- `AccordionItem.astro` — one `<details name={group}>` with the
+  glyph + name + chevron `<summary>` and a `.body` slot. The shared `name`
+  gives native exclusive-open with no JS; older browsers degrade to
+  multi-open. The summary is styled like the table `thead`s
+  (`--surface-head`, uppercase 600); `summary .glyph` is a fixed
+  `1.75rem` centered box at `font-weight: normal` (no Astronomicon
+  faux-bold) that doubles as the tint chip on the Planets
+  (`planetStyle()`) and Signs (`elementStyle()`) pages via the
+  `glyphStyle` prop.
+- `DignityCell.astro` — one planet-tinted cell: uppercase dignity label on
+  top, bare glyph below, optional `degree` (`<sup>`), `role`
+  (day/night/participant — tooltip only) and `joy` (J badge) props; the
+  localized `title` lives on the cell. Used by the Dignities accordion
+  (throne/exalt/triplicities/exile/fall) and the Signs accordion
+  (ruler/exalt/triplicities).
+- `PropsTable.astro` — label-left/value-right property table for the text
+  attribute sections (Planets: all five sections; Signs:
+  Nature/Attributes). Slotted children are alternating
+  `.prop-label`/`.prop-value` spans (the grid items); labels sit on
+  `--surface-head` (600 weight, **not** uppercase), values can hold markup
+  (chips on the Planets page) and `.multiline` preserves line breaks. No
+  tints on values (the Signs element row is plain text). `columns={n}`
+  flips to n columns — labels on top, values beneath, same child order
+  (column-major grid flow transposes) — used for Cycles and Planetary
+  Years. Styled
+  via `.props > :global(…)` so the slotted spans pick up the component's
+  CSS.
+
+Per-page notes:
+
+- Dignities body order: Throne + Exaltation (two-up `.pair-row`),
+  Triplicities (three-up `.tri-row`), Terms ruler, Faces ruler,
+  Exile + Fall (two-up), Almuten ruler. Section labels reuse `t.table.*`
+  with the score appended ("+5"… "−4"; Almuten bare) — there's no score row
+  on mobile. Exaltation is spelled in full (`t.table.exaltFull`).
+- Signs body order: Nature props table, Ruler + Exaltation (`.pair-row`,
+  Dignities-style cells, no scores in the labels), Triplicities
+  (`.tri-row`), Terms ruler, Faces ruler, Attributes props table.
+- If a sign has no exaltation (or no fall), that cell is omitted and the
+  remaining cell spans the full row (`.pair-row > :global(.cell:only-child)
+  { grid-column: 1 / -1 }`) — no "—" placeholder on mobile.
 - Cells follow the table conventions: `planetStyle()` tint on the cell,
   localized `title` tooltip on the cell, glyphs with no visible text label
   (the per-cell uppercase label names the dignity, not the planet).
@@ -179,11 +220,12 @@ styles; both stay in the DOM — static site). It renders inside
   `resize` — at mobile width the hidden `.table-wrap` has zero dimensions, so
   the load-time `update()` is a no-op until a resize back to desktop.
 - `details[open] summary` and `summary:focus-visible` both get a lighter
-  neutral background (`#f7f4ee`, vs. the default `#f0ebe2`) — a subtle hint
-  for which sign is open/focused, alongside the chevron rotation.
-- `.dignities-accordion *` has `outline: none` and
+  neutral background (`--surface-active`, vs. the default `--surface-head`) —
+  a subtle hint for which item is open/focused, alongside the chevron
+  rotation.
+- `.mobile-accordion :global(*)` has `outline: none` and
   `-webkit-tap-highlight-color: transparent` — no browser focus/tap outline
-  anywhere in the accordion (summary, cells, ruler segments, etc.); the
+  anywhere in the accordions (summary, cells, ruler segments, etc.); the
   lighter background above is the only focus/open indicator.
 
 ## Attribute tables (Planets & Signs)
@@ -220,16 +262,21 @@ the dignities pair).
   closes the top) — collapsed borders don't travel with sticky/transformed
   cells.
 - **Column stripes, not row zebra.** `tbody td:nth-child(even)` gets a
-  neutral `#f5f0e8` against the `#faf8f4` page background. Body cells carry
-  no planet/element tint — color coding lives only in the `thead` (planet
-  pastels on the planets table, `ELEMENT_COLORS` on the signs table).
+  neutral `--surface-stripe` against the `--bg` page background. Body cells
+  carry no planet/element tint — color coding lives only in the `thead`
+  (planet pastels on the planets table, `ELEMENT_COLORS` on the signs
+  table).
 - **Chips.** Planets inside body cells render as small `planetStyle()`-tinted
-  `.chip` squares with glyph + `title` tooltip. Signs-table chips add a
+  `.chip` squares with glyph + `title` tooltip; **sign** chips (the planets
+  table's Domicile/Exaltation rows) are tinted by their element
+  (`elementStyle()`), desktop and mobile. Signs-table chips add a
   hairline border (node chips have no planet color and need a visible box).
   `.chip.with-label` (auto width) is used on the signs table for Terms
   (start degree after the glyph, e.g. "♀ 0°") and Faces (localized ordinal
   before the glyph — `signsTable.faceOrdinals`: "1st/2nd/3rd",
-  "1.º/2.º/3.º") — desktop table only, not the accordion.
+  "1.º/2.º/3.º") — desktop table only. On mobile, the Signs accordion has
+  no chips (its dignities render as `DignityCell`s); the Planets accordion
+  keeps plain chips inside `PropsTable` value cells.
 
 ## UI conventions
 
@@ -245,17 +292,26 @@ the dignities pair).
 - Table cells (`td`) have `padding: 0` and `min-width: 60px` by default —
   individual columns add their own width/padding as needed (e.g.
   `td.col-terms { width: 20rem }`). Headers (`th`) keep normal padding.
-- Sign rows alternate background via `tbody tr:nth-child(even)` (a neutral
-  `#f2ede4`) — no element-based (Fire/Earth/Air/Water) row tinting anymore.
-- `--accent` (`Layout.astro` `:root`) is a neutral warm grey (`#5c5347`), not a
-  bright/purple accent — keep header/nav colors restrained. The header brand
-  (home) link uses `--fg` (plain text color), not `--accent`. The lang
-  switcher (`.lang-switcher`) is a single pill (`border-radius: 999px`,
+- Sign rows alternate background via `tbody tr:nth-child(even)`
+  (`--surface-stripe`) — no element-based (Fire/Earth/Air/Water) row tinting
+  anymore.
+- **Neutrals.** All neutral colors live in `Layout.astro` `:root` as a
+  non-semantic light→dark ramp (`--neutral-0` `#faf8f4` … `--neutral-9`
+  `#2b2622`, plus `--ink-rgb: 43, 38, 34` for `rgba()` alpha tints — ruler
+  ticks, scroll-shadow gradients, chip hairlines). Components only ever use
+  the semantic aliases assigned from the ramp: `--bg`, `--fg`, `--muted`,
+  `--border`, `--border-strong`, `--accent`, `--surface-active`,
+  `--surface-stripe`, `--surface-head`, `--surface-section`. New shades go
+  into the ramp first, then get an alias — no raw hexes in components.
+- `--accent` is a neutral warm grey (`--neutral-8`), not a bright/purple
+  accent — keep header/nav colors restrained. The header brand (home) link
+  uses `--fg` (plain text color), not `--accent`. The lang switcher
+  (`.lang-switcher`) is a single pill (`border-radius: 999px`,
   `overflow: hidden`) with the active language as a filled `--accent`
   segment — don't go back to per-link borders.
-- `table.dignities` overrides `--border` to `#a89c8c` — darker and more muted
-  than the page-wide `--border` (`#c9bdac` in `Layout.astro`), scoped to the
-  table only.
+- All three tables (and `MobileAccordion`) override `--border` to
+  `var(--border-strong)` — darker and more muted than the page-wide
+  `--border`, scoped to the tables/accordions only.
 - The sticky sign columns' "scrolled" shadow is rendered by two
   `.sticky-shadow` divs (`.table-wrap` is `display: grid`, table and shadows
   share `grid-area: 1 / 1`), not `box-shadow` on the sticky cells — gradient

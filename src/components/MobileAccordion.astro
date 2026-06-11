@@ -1,0 +1,36 @@
+---
+// Shared wrapper for the mobile accordions (Dignities, Planets, Signs):
+// owns the <768px CSS-only swap (the matching table's .table-wrap carries
+// the mirror-image rule), the table-border override, the no-outline rule,
+// and the open/close animation hookup. Children are <AccordionItem>s.
+---
+
+<div class="mobile-accordion"><slot /></div>
+
+<script>
+	import { setupAccordionAnimation } from "./accordion-animation";
+
+	setupAccordionAnimation(".mobile-accordion");
+</script>
+
+<style>
+	.mobile-accordion {
+		--border: var(--border-strong);
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.mobile-accordion {
+			display: block;
+		}
+	}
+
+	/* No browser focus/tap outline anywhere in the accordion — the lighter
+	   open/focused summary background (AccordionItem) is the only
+	   indicator. */
+	.mobile-accordion :global(*),
+	.mobile-accordion :global(*:focus-visible) {
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+</style>
