@@ -1,0 +1,389 @@
+---
+import {
+	STARS,
+	STAR_EPOCHS,
+	CONSTELLATIONS,
+	type Star,
+	type StarLongitude,
+} from "../data/stars";
+import { SIGNS } from "../data/dignities";
+import { ui, defaultLang, type Lang } from "../i18n";
+import { makeLabels, planetStyle, symbol } from "./dignities-shared";
+
+interface Props {
+	lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = ui[lang];
+const st = t.starsTable;
+const { name, signName } = makeLabels(lang);
+
+const starName = (s: Star) => (lang === "pt" && s.namePt ? s.namePt : s.name);
+const constName = (s: Star) => CONSTELLATIONS[s.constellation][lang];
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const lonTitle = (l: StarLongitude) =>
+	`${l.deg}° ${signName(SIGNS[l.sign].sign)} ${l.min}′`;
+
+// Pre-baked per-row search index (diacritic- and case-insensitive). Both
+// constellation languages are included — the Latin names are standard and
+// worth matching on the PT page too.
+const norm = (s: string) =>
+	s
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase();
+const searchText = (s: Star) =>
+	norm(
+		[
+			s.name,
+			s.namePt ?? "",
+			s.desc[lang],
+			CONSTELLATIONS[s.constellation].en,
+			CONSTELLATIONS[s.constellation].pt,
+		].join(" "),
+	);
+---
+
+<div class="star-search">
+	<input type="search" placeholder={st.search} aria-label={st.searchLabel} />
+</div>
+
+<div class="table-wrap">
+	<table class="stars">
+		<thead>
+			<tr>
+				<th class="col-name" colspan="2" rowspan="2">{st.star}</th>
+				<th class="col-mag" rowspan="2">{st.mag}</th>
+				<th class="col-longitude" colspan={STAR_EPOCHS.length}
+					>{st.longitude}</th
+				>
+				<th class="col-constellation" rowspan="2">{st.constellation}</th>
+			</tr>
+			<tr>
+				{STAR_EPOCHS.map((year) => <th class="col-year">{year}</th>)}
+			</tr>
+		</thead>
+		<tbody>
+			{
+				STARS.map((s) => (
+					<tr data-search={searchText(s)}>
+						<td class="col-name">
+							<span class:list={["star-name", { bright: s.mag <= 2 }]}>
+								{starName(s)}
+							</span>
+							<span class="star-desc">
+								{` – ${s.desc[lang]}`}
+								{s.designation && (
+									<span
+										class="designation"
+										title={st.designations[s.designation]}
+									>
+										{` (${s.designation})`}
+									</span>
+								)}
+							</span>
+						</td>
+						<td class="col-nature">
+							<span class="planet-chips">
+								{s.nature.map((p) => (
+									<span class="chip" style={planetStyle(p)} title={name(p)}>
+										<span class="glyph">{symbol(p)}</span>
+									</span>
+								))}
+							</span>
+						</td>
+						<td class="col-mag">{s.mag}</td>
+						{s.longitudes.map((l) => (
+							<td class="col-lon" title={lonTitle(l)}>
+								{pad(l.deg)}°
+								<span class="glyph sign-glyph">{SIGNS[l.sign].symbol}</span>
+								{pad(l.min)}′
+							</td>
+						))}
+						<td class="col-constellation">{constName(s)}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+</div>
+
+<p class="no-results" hidden>{st.noResults}</p>
+
+<script>
+	// Search filter + emulated sticky header. Same recipe as the attribute
+	// tables (the overflow-x wrap blocks real page-relative sticky on the
+	// thead), except the header parks below the sticky search bar instead of
+	// the viewport top, so the offset is the search bar's live bottom edge.
+	const wrap = document.querySelector<HTMLElement>(".table-wrap");
+	const search = document.querySelector<HTMLElement>(".star-search");
+	const input = document.querySelector<HTMLInputElement>(".star-search input");
+	const noResults = document.querySelector<HTMLElement>(".no-results");
+
+	if (wrap && search && input) {
+		const thead = wrap.querySelector<HTMLElement>("thead");
+		const rows = Array.from(
+			wrap.querySelectorAll<HTMLTableRowElement>("tbody tr"),
+		);
+
+		const update = () => {
+			if (!thead) return;
+			const y = Math.min(
+				Math.max(
+					0,
+					search.getBoundingClientRect().bottom -
+						wrap.getBoundingClientRect().top,
+				),
+				Math.max(0, wrap.clientHeight - thead.offsetHeight),
+			);
+			wrap.style.setProperty("--stick-y", `${y}px`);
+			wrap.style.setProperty("--thead-h", `${thead.offsetHeight}px`);
+			wrap.classList.toggle("stuck", y > 0);
+		};
+
+		const norm = (s: string) =>
+			s
+				.normalize("NFD")
+				.replace(/[\u0300-\u036f]/g, "")
+				.toLowerCase();
+
+		const filter = () => {
+			const q = norm(input.value.trim());
+			let visible = 0;
+			for (const row of rows) {
+				const match = !q || (row.dataset.search ?? "").includes(q);
+				row.hidden = !match;
+				if (match) visible++;
+			}
+			if (noResults) noResults.hidden = visible > 0;
+			update();
+		};
+
+		input.addEventListener("input", filter);
+		addEventListener("scroll", update, { passive: true });
+		addEventListener("resize", update);
+		update();
+	}
+</script>
+
+<style>
+	/* Real position: sticky works here — the search bar lives outside the
+	   overflow wrap and the page is the vertical scroller. Solid background
+	   so the table rows scroll away underneath it. */
+	.star-search {
+		position: sticky;
+		top: 0;
+		z-index: 4;
+		background: var(--bg);
+		padding: 0.25rem 0 0.75rem;
+	}
+
+	.star-search input {
+		width: 100%;
+		max-width: 28rem;
+		font: inherit;
+		font-size: 0.95rem;
+		color: var(--fg);
+		background: var(--bg);
+		border: 1px solid var(--border-strong);
+		border-radius: 999px;
+		padding: 0.45rem 1rem;
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.star-search input:focus-visible {
+		border-color: var(--accent);
+	}
+
+	.star-search input::placeholder {
+		color: var(--muted);
+	}
+
+	/* overflow-y: hidden so the shadow strip's last 8px clip at the table's
+	   bottom edge instead of growing a vertical scrollbar (per the planets/
+	   signs tables). The page does all vertical scrolling. */
+	.table-wrap {
+		overflow-x: auto;
+		overflow-y: hidden;
+	}
+
+	/* Full-width gradient shadow under the stuck header — same construction
+	   as the attribute tables: zero net height, sticky left: 0 to pin to the
+	   visible left edge, translated to sit just under the header cells. */
+	.table-wrap::before {
+		content: "";
+		display: block;
+		position: sticky;
+		left: 0;
+		height: 8px;
+		margin-bottom: -8px;
+		transform: translateY(calc(var(--stick-y, 0px) + var(--thead-h, 0px)));
+		background: linear-gradient(
+			to bottom,
+			rgba(var(--ink-rgb), 0.25),
+			transparent
+		);
+		opacity: 0;
+		transition: opacity 0.15s ease;
+		pointer-events: none;
+	}
+
+	.table-wrap.stuck::before {
+		opacity: 1;
+	}
+
+	/* Separate borders, each owned by exactly one cell, so the emulated
+	   sticky header carries its borders with it (see PlanetsTable). */
+	table.stars {
+		--border: var(--border-strong);
+		border-collapse: separate;
+		border-spacing: 0;
+		width: 100%;
+		font-size: 0.85rem;
+	}
+
+	table.stars th,
+	table.stars td {
+		border-bottom: 1px solid var(--border);
+		border-left: 1px solid var(--border);
+		padding: 0.35rem 0.6rem;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	/* The constellation column closes the table's right edge in both header
+	   rows (the year cells in the second thead row are not at the table
+	   edge — the rowspan constellation cell is). */
+	table.stars tbody td:last-child,
+	table.stars th.col-constellation {
+		border-right: 1px solid var(--border);
+	}
+
+	table.stars thead tr:first-child th {
+		border-top: 1px solid var(--border);
+	}
+
+	/* Emulated-sticky header cells — translated by --stick-y from the scroll
+	   listener; both thead rows ride the same offset. */
+	table.stars thead th {
+		background: var(--surface-head);
+		text-transform: uppercase;
+		font-size: 0.8rem;
+		letter-spacing: 0.02em;
+		font-weight: 600;
+		padding: 0.4rem 0.6rem;
+		position: relative;
+		z-index: 2;
+		transform: translateY(var(--stick-y, 0px));
+	}
+
+	table.stars thead th.col-name {
+		text-align: left;
+	}
+
+	table.stars [title] {
+		cursor: pointer;
+	}
+
+	/* Row zebra that skips rows hidden by the search filter. */
+	table.stars tbody tr:nth-child(even of :not([hidden])) {
+		background: var(--surface-stripe);
+	}
+
+	td.col-name {
+		text-align: left;
+		min-width: 17rem;
+	}
+
+	/* The source bolds the bright stars (magnitude 1–2). */
+	.star-name.bright {
+		font-weight: bold;
+	}
+
+	.star-desc {
+		font-style: italic;
+	}
+
+	td.col-mag {
+		width: 2.75rem;
+	}
+
+	td.col-lon {
+		width: 6.25rem;
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+	}
+
+	td.col-constellation {
+		text-align: left;
+		white-space: nowrap;
+	}
+
+	.glyph {
+		font-family: "Astronomicon", serif;
+		font-weight: normal;
+		line-height: 1;
+	}
+
+	.sign-glyph {
+		font-size: 1.05rem;
+		margin: 0 0.15rem;
+		vertical-align: -0.12em;
+	}
+
+	.planet-chips {
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 0;
+		justify-content: center;
+	}
+
+	td.col-nature {
+		width: 4.5rem;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid rgba(var(--ink-rgb), 0.2);
+	}
+
+	.chip:first-child:has(~ .chip) {
+		border-radius: 0.25rem 0 0 0.25rem;
+	}
+
+	.chip + .chip {
+		border-radius: 0 0.25rem 0.25rem 0;
+		border-left: 0;
+	}
+
+	.chip .glyph {
+		font-size: 1.5rem;
+	}
+
+	.no-results {
+		color: var(--muted);
+		font-style: italic;
+		padding: 0.5rem 0;
+	}
+
+	/* No mobile accordion on this page — a row-per-star table reads fine on
+	   small screens with horizontal scrolling, and the search needs the full
+	   list anyway. Just tighten it up a bit. */
+	@media (max-width: 767px) {
+		table.stars {
+			font-size: 0.8rem;
+		}
+
+		td.col-name {
+			min-width: 14rem;
+		}
+	}
+</style>

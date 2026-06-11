@@ -29,6 +29,11 @@ const navItems = [
 		base: "/signs/",
 		label: t.nav.signs,
 	},
+	{
+		href: lang === "pt" ? "/pt/stars/" : "/stars/",
+		base: "/stars/",
+		label: t.nav.stars,
+	},
 ].map((item) => ({ ...item, current: basePath === item.base }));
 
 const currentNavItem = navItems.find((item) => item.current);
@@ -358,7 +363,8 @@ const currentNavItem = navItems.find((item) => item.current);
 		color: var(--fg);
 		text-decoration: none;
 		font-size: 0.95rem;
-		padding: 0.3rem 0.85rem;
+		line-height: 1;
+		padding: 0.4rem 0.85rem;
 		border-radius: 999px;
 		transition:
 			background-color 0.15s ease,
@@ -387,7 +393,8 @@ const currentNavItem = navItems.find((item) => item.current);
 		gap: 0.4rem;
 		list-style: none;
 		cursor: pointer;
-		padding: 0.3rem 0.85rem;
+		line-height: 1;
+		padding: 0.4rem 0.85rem;
 		border-radius: 999px;
 		background: var(--surface-head);
 		font-size: 0.95rem;
@@ -451,7 +458,8 @@ const currentNavItem = navItems.find((item) => item.current);
 
 	.lang-switcher a {
 		margin-left: 0;
-		padding: 0.2rem 0.65rem;
+		line-height: 1;
+		padding: 0.45rem 0.65rem;
 		color: var(--muted);
 		text-decoration: none;
 	}
@@ -521,6 +529,10 @@ const currentNavItem = navItems.find((item) => item.current);
 		.nav-dropdown summary,
 		.nav-dropdown-menu a {
 			font-size: 0.85rem;
+		}
+
+		.nav-dropdown summary {
+			padding-block: 0.45rem;
 		}
 
 		.lang-switcher {

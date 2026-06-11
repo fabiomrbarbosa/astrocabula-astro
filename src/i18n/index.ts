@@ -18,6 +18,7 @@ export const ui = {
 			dignities: "Essential Dignities",
 			planets: "Planets",
 			signs: "Signs",
+			stars: "Fixed Stars",
 		},
 		page: {
 			title: "Essential Dignities",
@@ -27,6 +28,9 @@ export const ui = {
 		},
 		signsPage: {
 			title: "Sign Attributes",
+		},
+		starsPage: {
+			title: "Fixed Stars",
 		},
 		table: {
 			sign: "Sign",
@@ -104,6 +108,20 @@ export const ui = {
 			sectionDignities: "Dignities",
 			sectionAttributes: "Attributes",
 		},
+		starsTable: {
+			star: "Name and planetary nature",
+			mag: "Mag",
+			longitude: "Zodiacal longitude",
+			constellation: "Constellation",
+			search: "Search star or constellation…",
+			searchLabel: "Search stars",
+			noResults: "No stars match your search.",
+			designations: {
+				N: "Nebula",
+				E: "Star cluster",
+				G: "Galaxy",
+			},
+		},
 		weekdays: [
 			"Sunday",
 			"Monday",
@@ -124,6 +142,7 @@ export const ui = {
 			dignities: "Dignidades Essenciais",
 			planets: "Planetas",
 			signs: "Signos",
+			stars: "Estrelas Fixas",
 		},
 		page: {
 			title: "Dignidades Essenciais",
@@ -133,6 +152,9 @@ export const ui = {
 		},
 		signsPage: {
 			title: "Atributos dos Signos",
+		},
+		starsPage: {
+			title: "Estrelas Fixas",
 		},
 		table: {
 			sign: "Signo",
@@ -209,6 +231,20 @@ export const ui = {
 			sectionNature: "Natureza",
 			sectionDignities: "Dignidades",
 			sectionAttributes: "Atributos",
+		},
+		starsTable: {
+			star: "Nome e natureza planetária",
+			mag: "Mag",
+			longitude: "Longitude zodiacal",
+			constellation: "Constelação",
+			search: "Pesquisar estrela ou constelação…",
+			searchLabel: "Pesquisar estrelas",
+			noResults: "Nenhuma estrela corresponde à pesquisa.",
+			designations: {
+				N: "Nebulosa",
+				E: "Enxame de estrelas",
+				G: "Galáxia",
+			},
 		},
 		weekdays: [
 			"Domingo",

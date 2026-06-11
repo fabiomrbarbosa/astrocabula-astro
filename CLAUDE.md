@@ -2,7 +2,8 @@
 
 A static multi-page site of traditional astrology cheatsheets, built with Astro.js.
 Pages: Essential Dignities (`/`), Planetary Attributes (`/planets/`), Sign
-Attributes (`/signs/`) — each with a Portuguese variant under `/pt/`.
+Attributes (`/signs/`), Fixed Stars (`/stars/`) — each with a Portuguese
+variant under `/pt/`.
 
 ## Stack
 
@@ -74,8 +75,12 @@ triplicityLabel }` (avoids threading `lang` through every call).
   the PDF-only attributes from `signs.ts`. `ELEMENT_COLORS`/`elementStyle()`
   (fire pink, earth green, air yellow, water periwinkle) live in
   `signs-shared.ts`.
+- `src/components/StarsTable.astro` + `src/data/stars.ts` — Fixed Stars page
+  (`src/pages/stars/`, `pt/stars/`): one row per star, with a client-side
+  search box on top. No `*-shared.ts` module and no mobile accordion (see
+  "Fixed Stars page" below).
 - `src/components/accordion-animation.ts` — shared open/close animation used
-  by all three accordions.
+  by the three accordions (Dignities/Planets/Signs).
 
 ## Data sources
 
@@ -88,8 +93,13 @@ repo):
 - A companion text reference (`essential_dignities_reference.txt`, not in repo)
   with per-sign breakdowns, scoring rules, planetary/sign attributes, fixed
   stars, and orb tables — the essential-dignities, planetary-attributes and
-  sign-attributes portions have been used. The rest (fixed stars, orbs) is
-  unused but available for future cheatsheet pages.
+  sign-attributes portions have been used. The rest (orbs) is unused but
+  available for future cheatsheet pages.
+- _Tabela de Estrelas Fixas e sua natureza_ © 2019 Helena Avelar & Luís
+  Ribeiro (PDF, provided in-conversation) — source of `src/data/stars.ts`.
+  Its notes page (alternative star names etc.) was deliberately not
+  transcribed; only the N/E/G designation letters survive as a `designation`
+  field (tooltip explains them).
 - Attribution is rendered in the site footer (`Layout.astro`).
 
 Known judgment calls baked into `dignities.ts`:
@@ -99,6 +109,53 @@ Known judgment calls baked into `dignities.ts`:
   Sagittarius and falls in Gemini (all at 3°).
 - Almuten entries are split into degree-range segments; co-almutens (ties) are
   represented as multiple planets in one `AlmutenEntry`.
+
+## Fixed Stars page
+
+`StarsTable.astro` + `src/data/stars.ts` (111 stars, source order = ascending
+2000 longitude). This table is row-per-star, so unlike the other three pages
+it has **no mobile accordion** — the one table just scrolls horizontally at
+any width (the component has no <768px `display: none` rule).
+
+- **Data shape.** Longitudes are stored as the source prints them
+  (`"09I46"` = 9° of sign index 8 + 46′) and parsed by `lons()` at module
+  load — the build itself validates every token. Sign letters A–L are the
+  same scheme as the Astronomicon glyphs; `StarLongitude.sign` is the 0–11
+  index into `SIGNS` (dignities.ts) for glyph + localized name.
+  `nature: Planet[]` (1–2 planets), `mag`, `designation?: "N" | "E" | "G"`
+  (nebula/cluster/galaxy — rendered as the bare letter after the
+  description, tooltip = `starsTable.designations`), `constellation` is a
+  key into `CONSTELLATIONS` (bilingual names; PT mostly the source's common
+  names — "A Quilha", "Boieiro"). `namePt` only where spelling differs
+  (Plêiades). Known source quirks kept verbatim: Princeps/Khambalia/Han
+  repeat their 2000 longitude in 2050; Skat's 1900→1950 step is 8′; Al
+  Hecka's constellation is printed "Gémeos".
+- **Search box.** `.star-search` sits above `.table-wrap` and is real
+  `position: sticky; top: 0` (it's outside the overflow wrap, so page-level
+  sticky works). Filtering is client-side: each `tbody tr` carries a
+  pre-baked `data-search` attribute (NFD-normalized, diacritic-stripped,
+  lowercased: name + namePt + localized description + both languages'
+  constellation names); the input handler toggles `tr.hidden` by substring
+  match and untoggles the `.no-results` paragraph. Zebra striping uses
+  `tbody tr:nth-child(even of :not([hidden]))` so stripes stay alternating
+  after filtering.
+- **Sticky header.** Same emulated-sticky recipe as the attribute tables
+  (separate borders, `--stick-y`/`--thead-h`, `.stuck` shadow strip), with
+  one difference: the clamp's lower bound is the search bar's live
+  `getBoundingClientRect().bottom` instead of 0, so the thead parks just
+  below the stuck search box. The filter handler also calls `update()`
+  (table height changes when rows hide).
+- Two-row thead: row 1 is Name+nature (colspan 2, rowspan 2 — the body
+  keeps separate name/nature cells, so the vertical border between them
+  exists in the body only, like the PDF), Mag, "Zodiacal longitude"
+  (colspan 4), Constellation; row 2 is the four epoch years (1900–2050).
+  Border note: the year cells must NOT get a `last-child` right border —
+  the rowspan constellation cell closes the table's right edge in both rows.
+- Star names with mag ≤ 2 are bold (`.star-name.bright`), matching the
+  source's bolded bright stars. Nature planets render as the planets
+  table's `.chip`s (planetStyle tint + tooltip); longitude cells are
+  `DD°<sign glyph>MM′` with a localized tooltip ("9° Sagittarius 46′") on
+  the `td`.
 
 ## Astronomicon font
 
@@ -436,5 +493,5 @@ then a small script with `chromium.launch()` → `page.goto('http://localhost:PO
 
 ## Next steps (not started)
 
-- Additional cheatsheet pages (fixed stars, orbs) using the unused reference
-  data described above; add their links to the shared nav in `Layout.astro`.
+- Additional cheatsheet pages (orbs) using the unused reference data
+  described above; add their links to the shared nav in `Layout.astro`.
