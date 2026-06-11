@@ -11,11 +11,11 @@ import { join, relative, sep } from "node:path";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 
-// Reforma1969/2018 ship in public/ but are unused by the site; sw.js is
+// Reforma1969/1918 ship in public/ but are unused by the site; sw.js is
 // this script's own output; .DS_Store is Finder junk copied from public/.
 const EXCLUDE = [
 	/^fonts\/Reforma1969\//,
-	/^fonts\/Reforma2018\//,
+	/^fonts\/Reforma1918\//,
 	/^sw\.js$/,
 	/(^|\/)\.DS_Store$/,
 ];

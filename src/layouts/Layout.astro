@@ -198,16 +198,16 @@ const currentNavItem = navItems.find((item) => item.current);
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-Blanca.woff2") format("woff2");
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-Blanca.woff2") format("woff2");
 		font-weight: 300;
 		font-style: normal;
 		font-display: swap;
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-BlancaItalica.woff2")
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-BlancaItalica.woff2")
 			format("woff2");
 		font-weight: 300;
 		font-style: italic;
@@ -215,32 +215,32 @@ const currentNavItem = navItems.find((item) => item.current);
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-Gris.woff2") format("woff2");
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-Gris.woff2") format("woff2");
 		font-weight: normal;
 		font-style: normal;
 		font-display: swap;
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-GrisItalica.woff2") format("woff2");
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-GrisItalica.woff2") format("woff2");
 		font-weight: normal;
 		font-style: italic;
 		font-display: swap;
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-Negra.woff2") format("woff2");
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-Negra.woff2") format("woff2");
 		font-weight: bold;
 		font-style: normal;
 		font-display: swap;
 	}
 
 	@font-face {
-		font-family: "Reforma1918";
-		src: url("/fonts/Reforma1918/Reforma1918-NegraItalica.woff2")
+		font-family: "Reforma2018";
+		src: url("/fonts/Reforma2018/Reforma2018-NegraItalica.woff2")
 			format("woff2");
 		font-weight: bold;
 		font-style: italic;
@@ -260,9 +260,9 @@ const currentNavItem = navItems.find((item) => item.current);
 		--neutral-4: #e9e2d6;
 		--neutral-5: #c9bdac;
 		--neutral-6: #a89c8c;
-		--neutral-7: #756d64;
-		--neutral-8: #5c5347;
-		--neutral-9: #2b2622;
+		--neutral-7: #756c64;
+		--neutral-8: #5c4e47;
+		--neutral-9: #2b2422;
 		--ink-rgb: 43, 38, 34;
 
 		/* Semantic aliases */
@@ -297,7 +297,8 @@ const currentNavItem = navItems.find((item) => item.current);
 
 	body {
 		font-family:
-			"Reforma1918", "Iowan Old Style", Georgia, "Times New Roman", serif;
+			"Reforma2018", "Iowan Old Style", Georgia, "Times New Roman", serif;
+		font-weight: 300;
 		background: var(--bg);
 		color: var(--fg);
 		line-height: 1.5;
@@ -359,7 +360,9 @@ const currentNavItem = navItems.find((item) => item.current);
 		font-size: 0.95rem;
 		padding: 0.3rem 0.85rem;
 		border-radius: 999px;
-		transition: background-color 0.15s ease, color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
 	}
 
 	.nav-links a:hover,

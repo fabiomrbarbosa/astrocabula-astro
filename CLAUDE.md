@@ -25,7 +25,7 @@ Attributes (`/signs/`) — each with a Portuguese variant under `/pt/`.
 
 - `src/layouts/Layout.astro` — shared page shell: header with site nav (add new
   pages' links here), footer with data attribution, global CSS (`:root`
-  variables for colors, the `Astronomicon` and `Reforma1918` `@font-face`
+  variables for colors, the `Astronomicon` and `Reforma2018` `@font-face`
   declarations).
 - `src/components/DignitiesTable.astro` — renders the essential dignities table
   from `src/data/dignities.ts`. Rows alternate neutral shades (zebra striping);
@@ -115,9 +115,9 @@ loaded via `@font-face` in `Layout.astro` and applied to `.glyph` spans in
 these letters — don't revert to Unicode astrological symbols (they render as
 colored emoji in some browsers, which was the original problem this solved).
 
-## Reforma1918 font
+## Reforma2018 font
 
-`public/fonts/Reforma1918/*.woff2` (Blanca/Gris/Negra weights, each with an
+`public/fonts/Reforma2018/*.woff2` (Blanca/Gris/Negra weights, each with an
 italic) is the site-wide body font, declared via `@font-face` in
 `Layout.astro` and listed first in `body { font-family: ... }` (falls back to
 Iowan Old Style → Georgia → serif). Weight mapping: Blanca = 300, Gris =
@@ -152,11 +152,9 @@ class and styling as the triplicities' D/N/P labels — and its tooltip becomes
 `joyLabel(planet)` ("Planet (Joy)" / "Planeta (Gáudio)") instead of the plain
 planet name. Implemented in `DignitiesTable.astro` (`td.col-throne`, added to
 the `position: relative` cell list) and `DignityCell.astro` (`joy` prop —
-used by both the Dignities and Signs accordions' ruler cells; its
-`.tri-label` uses fixed `0.25rem` offsets instead of the table's
-`--tick-spacing`, and `font-family: Georgia, Times, serif` so the "J"
-doesn't pick up Reforma1918). The English "Throne" header/label was renamed
-to "Ruler" (`t.table.throne`); Portuguese stays "Trono".
+used by both the Dignities and Signs accordions' ruler cells). The English
+"Throne" header/label was renamed to "Ruler" (`t.table.throne`); Portuguese
+stays "Trono".
 
 ## Mobile accordion
 
@@ -212,7 +210,7 @@ Per-page notes:
   (`.tri-row`), Terms ruler, Faces ruler, Attributes props table.
 - If a sign has no exaltation (or no fall), that cell is omitted and the
   remaining cell spans the full row (`.pair-row > :global(.cell:only-child)
-  { grid-column: 1 / -1 }`) — no "—" placeholder on mobile.
+{ grid-column: 1 / -1 }`) — no "—" placeholder on mobile.
 - Cells follow the table conventions: `planetStyle()` tint on the cell,
   localized `title` tooltip on the cell, glyphs with no visible text label
   (the per-cell uppercase label names the dignity, not the planet).
@@ -401,7 +399,7 @@ force-install it.
   content-hashes every file into the cache name (`astrocabula-<hash>`), and
   writes `dist/sw.js` with the precache list. HTML is cached under pretty
   URLs (`/pt/planets/`, not `pt/planets/index.html`) so navigations match
-  cache keys. Excluded: unused `fonts/Reforma1969|2018`, `.DS_Store`, and
+  cache keys. Excluded: unused `fonts/Reforma1969|1918`, `.DS_Store`, and
   `sw.js` itself.
 - The SW is cache-first for same-origin GETs — safe because any deploy
   changes the hash → byte-different `sw.js` → browser reinstalls and the
